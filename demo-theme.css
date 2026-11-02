@@ -1,0 +1,12 @@
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  --tint: #dbe7ff; --tint-fill: #dbe7ff; --on-tint: #0b0e14; --focus: #8fb8ff;
+  --ink: #eaf0fa; --ink-2: #bcc6d8; --ink-3: #95a1b6;
+  --hairline: #232b39; --hairline-strong: #343e50; --rule: #343e50;
+  --fill: #1c2330; --fill-pressed: #262e3d; --on-ink: #0b0e14;
+  --base: #0b0e14; --solid: #131822; --solid-2: #1a202c; --surface: #131822; --card: #131822;
+  --glass-bg: #131822;
+  --switch-on: #dbe7ff; --knob: #0b0e14;
+  --rail: #1b2230; --rail-ink: #bcc6d8; --rail-on: #eaf0fa; --rail-on-ink: #0b0e14;
+  --bubble: #222a3a; --bubble-ink-2: #d0d8e6; --bubble-ink-3: #b6c0d2;
+}

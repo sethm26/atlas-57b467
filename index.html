@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#06090f">
 <script>
   // Apply a saved Light/Dark choice before first paint so the page never flashes the wrong theme.
-  try { const t = localStorage.getItem('atlas-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
+  try { const t = localStorage.getItem('atlas-theme'); document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark'; } catch {}
 </script>
 <meta name="description" content="Where To Points: see where your credit card points can fly you. Award seats priced in Amex, Chase, Citi, Capital One and Bilt points, on a map.">
 <title>Where To Points</title>
@@ -798,6 +798,7 @@ body[data-mode="deals"] .search { display: none !important; }
 }
 </style>
 <link rel="stylesheet" href="design.css">
+<link rel="stylesheet" href="demo-theme.css">
 </head>
 <body class="app" data-mode="search" data-trip="ow" data-sheet="closed">
 <a class="skip" href="#results" id="skip-link">Skip to results</a>
