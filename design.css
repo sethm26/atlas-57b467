@@ -1,0 +1,1197 @@
+/* Where To Points, design "Studio" (Seth approved it on 2026-10-29): the site's one stylesheet.
+   A friendly dashboard look: white cards with big 22px corners and a soft shadow, Plus Jakarta Sans
+   with dark headings at weight 600 at most, neutral tiles, dark bubbles for tooltips, toasts and Rules
+   of thumb, charcoal as the one interactive accent. Warm color only ever means price against typical
+   (the value tiers), so nothing else on the page is peach or orange. On the map page every
+   control floats over a full-screen map (dark space and a satellite-style globe in both themes): the
+   control panel is top left, the results panel floats below it, the mode bar and the logo at the
+   bottom; on a phone the map is home and a bottom sheet holds the search and results. Fare colors
+   are the value tiers (atlas/web/tiers.js: white at or below typical, shading to dark orange), set in
+   the page's own CSS. The account and legal
+   pages link this after site.css. Light and dark (Auto follows the system; the Appearance pills are on the control panel).
+   Font: Plus Jakarta Sans 5.2.8 (fontsource, OFL, vendor/fonts/OFL-PlusJakartaSans.txt). */
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("vendor/fonts/plus-jakarta-sans.woff2") format("woff2");
+}
+
+/* ---------- tokens: light (sage) ---------- */
+:root {
+  color-scheme: light;
+  --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --tint: #1e2220;              /* the one accent: charcoal links, active pills, primary buttons */
+  --tint-fill: #1e2220;
+  --on-tint: #ffffff;
+  --focus: #1e2220;
+  --ink: #1b1f1d;
+  --ink-2: #46504b;
+  --ink-3: #5b6560;
+  --hairline: #e3e9e5;
+  --hairline-strong: #cfd8d3;
+  --rule: #cfd8d3;
+  --fill: #eef3f0;
+  --fill-pressed: #e1e9e4;
+  --on-ink: #ffffff;
+  --base: #dfe9e3;
+  --solid: #ffffff;
+  --solid-2: #f5f8f6;
+  --surface: #ffffff;
+  --glass-bg: #ffffff;
+  --glass-edge: transparent;
+  --glass-hi: transparent;
+  --glass-sheen: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 1px 2px rgba(22, 44, 32, 0.05), 0 16px 36px -18px rgba(22, 44, 32, 0.22);
+  --card-shadow: 0 1px 2px rgba(22, 44, 32, 0.04), 0 10px 28px -16px rgba(22, 44, 32, 0.16);
+  --lift: 0 1px 2px rgba(22, 44, 32, 0.05), 0 14px 30px -14px rgba(22, 44, 32, 0.24);
+  --switch-on: #1e2220;
+  --knob: #ffffff;
+  /* the dark mode bar and the dark bubbles (tooltip, toast, Rules of thumb) */
+  --rail: #1e2220;
+  --rail-ink: #c9d1cc;
+  --rail-on: #ffffff;
+  --rail-on-ink: #1e2220;
+  --bubble: #1e2220;
+  --bubble-ink: #ffffff;
+  --bubble-ink-2: #d3dbd6;
+  --bubble-ink-3: #b3bdb7;
+  --lowest: #f2a516;            /* amber corner flag on the cheapest day (shape carries it too) */
+  --picked: #e0584d;            /* coral ring around the chosen day (3.7:1 on white) */
+  --mint: #dcf2e3;  --mint-ink: #1f6b3a;
+  --warn-bg: #fdf0d5; --warn-ink: #6e4500; --warn-line: #f3dca6;
+  --bad-ink: #b3261e; --bad-bg: #fde8e7;
+  --r-widget: 22px;
+  --r-tile: 16px;
+  --r-control: 12px;            /* controls are rounded squares, never pills: fields, buttons, icon buttons */
+  --r-small: 8px;               /* chips, small buttons and anything nested in a control */
+  --r-tag: 6px;                 /* tags, map labels, badges */
+  --spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* icons for the mode bar and the profile tile (masks, painted in currentColor) */
+  --i-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m15.5 15.5 4.5 4.5'/%3E%3C/svg%3E");
+  --i-routes: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='5' cy='18' r='2.2'/%3E%3Ccircle cx='19' cy='18' r='2.2'/%3E%3Cpath d='M6.6 15.8C8.5 8 15.5 8 17.4 15.8' stroke-dasharray='2.5 3'/%3E%3C/svg%3E");
+  --i-deals: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'%3E%3Cpath d='M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1 1 0 0 1 0 1.4l-7.3 7.3a1 1 0 0 1-1.4 0z'/%3E%3Ccircle cx='8' cy='8' r='1.6' fill='black' stroke='none'/%3E%3C/svg%3E");
+  --i-person: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8.5' r='4'/%3E%3Cpath d='M4.5 20c1.4-3.6 4.3-5.5 7.5-5.5s6.1 1.9 7.5 5.5'/%3E%3C/svg%3E");
+  /* account and legal pages (site.css names) */
+  --bg: var(--base); --card: #ffffff; --line: var(--hairline); --bad: var(--bad-ink);
+}
+
+/* ---------- tokens: dark (green-charcoal; raised surfaces get lighter) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --tint: #eef3f0; --tint-fill: #eef3f0; --on-tint: #141917; --focus: #9fd3b4;
+    --ink: #eef3f0; --ink-2: #c3ccc7; --ink-3: #9ba6a0;
+    --hairline: #2e3632; --hairline-strong: #414b46; --rule: #414b46;
+    --fill: #2a322e; --fill-pressed: #343d38; --on-ink: #141917;
+    --base: #141917; --solid: #1e2421; --solid-2: #252c28; --surface: #1e2421;
+    --glass-bg: #1e2421; --glass-sheen: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 30px -18px rgba(0, 0, 0, 0.6);
+    --lift: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 32px -14px rgba(0, 0, 0, 0.7);
+    --switch-on: #eef3f0; --knob: #141917;
+    --rail: #2b332f; --rail-ink: #c3ccc7; --rail-on: #eef3f0; --rail-on-ink: #141917;
+    --bubble: #2f3833; --bubble-ink: #ffffff; --bubble-ink-2: #d3dbd6; --bubble-ink-3: #b9c3bd;
+    --lowest: #f2b33c; --picked: #f08a80;
+    --mint: #1d3326;  --mint-ink: #a6dcb5;
+    --warn-bg: #352a14; --warn-ink: #f0cf86; --warn-line: #4d3e1e;
+    --bad-ink: #ff9a90; --bad-bg: #3a2321;
+    --card: #1e2421;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --tint: #eef3f0; --tint-fill: #eef3f0; --on-tint: #141917; --focus: #9fd3b4;
+  --ink: #eef3f0; --ink-2: #c3ccc7; --ink-3: #9ba6a0;
+  --hairline: #2e3632; --hairline-strong: #414b46; --rule: #414b46;
+  --fill: #2a322e; --fill-pressed: #343d38; --on-ink: #141917;
+  --base: #141917; --solid: #1e2421; --solid-2: #252c28; --surface: #1e2421;
+  --glass-bg: #1e2421; --glass-sheen: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 30px -18px rgba(0, 0, 0, 0.6);
+  --lift: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 32px -14px rgba(0, 0, 0, 0.7);
+  --switch-on: #eef3f0; --knob: #141917;
+  --rail: #2b332f; --rail-ink: #c3ccc7; --rail-on: #eef3f0; --rail-on-ink: #141917;
+  --bubble: #2f3833; --bubble-ink: #ffffff; --bubble-ink-2: #d3dbd6; --bubble-ink-3: #b9c3bd;
+  --lowest: #f2b33c; --picked: #f08a80;
+  --mint: #1d3326;  --mint-ink: #a6dcb5;
+  --warn-bg: #352a14; --warn-ink: #f0cf86; --warn-line: #4d3e1e;
+  --bad-ink: #ff9a90; --bad-bg: #3a2321;
+  --card: #1e2421;
+}
+
+/* Increase Contrast: secondary inks become the main ink, hairlines become rules. */
+@media (prefers-contrast: more) {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"] {
+    --ink-2: var(--ink); --ink-3: var(--ink);
+    --hairline: var(--ink-3); --hairline-strong: var(--ink); --rule: var(--ink);
+    --rail-ink: #ffffff;
+    --bubble-ink-2: #ffffff; --bubble-ink-3: #ffffff;
+  }
+}
+
+/* =====================================================================
+   Map page
+   ===================================================================== */
+
+/* Plus Jakarta Sans has a narrow word space (0.17em); open it to a normal 0.25em. */
+:root body {
+  font: 500 0.875rem/1.45 var(--font);
+  letter-spacing: 0;
+  word-spacing: 0.08em;
+}
+:root :is(b, strong) { font-weight: 600; }   /* the browser default (700) is above the cap */
+:where(:root) :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+:root a { color: var(--tint); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+:root .skip { border-radius: var(--r-control); background: var(--tint-fill); color: var(--on-tint); font-weight: 600; }
+:root .num { font-variant-numeric: tabular-nums; }
+
+/* No glass: every floating layer is a solid white card with a soft shadow. */
+:root :is(.glass, .legend) {
+  background: var(--solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--card-shadow);
+}
+:root .sheen::before { display: none; }
+:root .skel::after { background: linear-gradient(90deg, transparent, var(--glass-sheen), transparent); }
+
+/* Round white icon buttons, like the screenshot's top-right icons. */
+:root .icon-btn { color: var(--ink); }
+:root .icon-btn:hover { background: var(--fill); }
+/* settings menu */
+:root .menu {
+  width: min(17rem, calc(100vw - 24px));
+  padding: 16px;
+  gap: 12px;
+  border-radius: 20px;
+  background: var(--solid);
+  box-shadow: 0 0 0 1px var(--hairline), var(--glass-shadow);
+}
+:root .menu h2 { color: var(--ink); font-size: 0.8125rem; font-weight: 600; }
+:root .menu p { color: var(--ink-2); font-size: 0.8125rem; line-height: 1.5; }
+
+/* ---------- segmented controls and buttons ---------- */
+:root .seg { padding: 4px; gap: 2px; border-radius: var(--r-control); background: var(--fill); }
+:root .seg button { border-radius: var(--r-small); color: var(--ink-2); font-weight: 500; }
+:root .seg button:hover { color: var(--ink); }
+:root .seg button[aria-pressed="true"] { background: var(--tint-fill); color: var(--on-tint); box-shadow: none; }
+:root .btn {
+  min-height: 40px;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  color: var(--ink);
+  font-weight: 600;
+}
+:root .btn:hover { background: var(--fill-pressed); }
+:root .btn.filled { background: var(--tint-fill); color: var(--on-tint); box-shadow: none; }
+:root .btn.filled:hover { background: var(--tint-fill); filter: none; opacity: 0.88; }
+:root .btn-text { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+:root .more-btn { text-decoration: none; }
+:root .more-btn:hover { text-decoration: underline; }
+:root .btn-text:disabled { color: var(--ink-3); text-decoration: none; }
+
+/* ---------- search form: one white rounded card ---------- */
+:root .row-main { gap: 12px 16px; }
+:root .flabel { padding-left: 4px; color: var(--ink-2); font-size: 0.75rem; font-weight: 600; }
+:root .hint { padding-left: 4px; color: var(--ink-3); }
+:root :is(.input, .pill-select) {
+  border-radius: var(--r-control);
+  background-color: var(--fill);
+  box-shadow: none;
+  color: var(--ink);
+  font-weight: 500;
+}
+:root :is(.input, .pill-select):hover { background-color: var(--fill-pressed); }
+:root .pill-select { border-radius: var(--r-control); }
+:root .pill-select.small { border-radius: var(--r-small); min-height: 30px; background-color: var(--solid); box-shadow: inset 0 0 0 1px var(--hairline-strong); color: var(--ink); }
+:root .input[aria-invalid="true"],
+:root .combo-box[data-invalid="true"] { box-shadow: inset 0 0 0 2px var(--bad-ink); }
+:root .go { min-height: 48px; padding: 0 1.6rem; border-radius: var(--r-control); font-size: 0.9375rem; font-weight: 600; }
+:root .swap { border-radius: var(--r-control); background: var(--solid); box-shadow: inset 0 0 0 1px var(--hairline-strong); color: var(--ink); }
+:root .swap:hover { background: var(--fill); }
+:root .more {
+  gap: 12px 16px;
+  padding: 16px;
+  border-radius: var(--r-tile);
+  background: var(--solid-2);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+:root .more :is(.input, .pill-select) { background-color: var(--solid); box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+:root .more .field { align-content: start; }
+:root .more .field > :is(.input, .pill-select) { width: 100%; min-width: 0; }
+:root .form-error {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--bad-bg);
+  color: var(--bad-ink);
+  font-weight: 600;
+}
+
+/* program chips and removable filter chips: small rounded tags */
+:root .chip {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-small);
+  background: var(--solid);
+  box-shadow: inset 0 0 0 1px var(--hairline-strong);
+  color: var(--ink-2);
+  font-weight: 500;
+}
+:root .chip:hover { color: var(--ink); background: var(--fill); }
+:root .chip[aria-pressed="true"] { background: var(--tint-fill); color: var(--on-tint); box-shadow: none; }
+:root .chip.x { background: var(--fill); box-shadow: none; color: var(--ink); }
+:root .chip.x:hover { background: var(--fill-pressed); }
+
+/* switches: the knob's side carries the state, the track darkens */
+:root .switch { font-weight: 600; }
+:root .switch input { width: 40px; height: 24px; border-radius: var(--r-small); background: var(--fill-pressed); box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+:root .switch input::after { top: 2px; left: 2px; width: 20px; height: 20px; border-radius: var(--r-tag); background: #ffffff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+:root .switch input:checked { background: var(--switch-on); box-shadow: none; }
+:root .switch input:checked::after { transform: translateX(16px); background: var(--knob); }
+:root .switch input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* place picker */
+:root .combo-box { border-radius: var(--r-control); background: var(--fill); box-shadow: none; }
+:root .combo-box:hover { background: var(--fill-pressed); }
+:root .combo-box:focus-within { background: var(--solid); box-shadow: 0 0 0 2px var(--focus); }
+:root .pchip {
+  min-height: 30px;
+  border-radius: var(--r-tag);
+  background: var(--solid);
+  box-shadow: 0 1px 2px rgba(22, 44, 32, 0.08), inset 0 0 0 1px var(--hairline);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+:root .pchip b { font-weight: 600; }
+:root .pchip-x { border-radius: 4px; }
+:root .pchip-x:hover { background: var(--fill-pressed); }
+:root .listbox {
+  padding: 8px;
+  border-radius: var(--r-tile);
+  background: var(--solid);
+  box-shadow: 0 0 0 1px var(--hairline), var(--glass-shadow);
+}
+:root .opt { border-radius: var(--r-small); }
+:root .opt:hover { background: var(--fill); }
+:root .opt[aria-selected="true"] { background: var(--fill-pressed); box-shadow: inset 3px 0 0 var(--tint); }
+:root .opt .badge {
+  border-radius: var(--r-tag);
+  background: var(--fill-pressed);
+  color: var(--ink-2);
+  box-shadow: none;
+  font-weight: 600;
+}
+:root .opt .l { font-weight: 600; }
+
+/* Open dropdown lists: rounded like the controls. Customizable select with a mouse only: on touch
+   screens (recent Safari supports it too, and its list wrapped and scrolled sideways on an iPhone)
+   the phone's own picker is better. The control itself stays a pill either way. */
+@supports (appearance: base-select) { @media (hover: hover) and (pointer: fine) {
+  select.pill-select { appearance: base-select; display: inline-flex; align-items: center; }
+  select.pill-select::picker-icon { display: none; }   /* the pill draws its own chevron */
+  select.pill-select::picker(select) {
+    appearance: base-select; margin-block: 6px; padding: 6px; border: 0; border-radius: var(--r-tile);
+    max-height: min(60dvh, 24rem); overflow-y: auto;
+    background: var(--solid); color: var(--ink);
+    box-shadow: 0 0 0 1px var(--hairline), var(--glass-shadow);
+  }
+  select.pill-select option {
+    display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 12px;
+    border-radius: var(--r-small); background: transparent; color: var(--ink);
+    font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  }
+  select.pill-select option::checkmark { display: none; }
+  select.pill-select option:hover { background: var(--fill); }
+  select.pill-select option:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; background: var(--fill); }
+  select.pill-select option:checked { background: var(--fill-pressed); font-weight: 600; }
+} }
+/* measures the phone's bottom safe area for mapInsets() */
+#safe-bottom { position: fixed; bottom: 0; width: 0; height: env(safe-area-inset-bottom); visibility: hidden; }
+/* iOS zooms the whole page on focus of any field under 16px, and stays zoomed: sideways scrolling. */
+@media (pointer: coarse) {
+  :is(select, textarea, input:not([type="checkbox"], [type="radio"])) { font-size: max(1rem, 16px) !important; }
+}
+/* iOS gives date fields a native width that ignores the grid they sit in. */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"] { -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%; }
+  input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+}
+
+/* phone bar */
+:root .pill,
+:root .pill.glass {
+  border-radius: var(--r-control);
+  background: var(--solid);
+  box-shadow: var(--card-shadow);
+  font-weight: 600;
+}
+/* notice */
+:root .notice {
+  border-radius: var(--r-tile);
+  background: var(--warn-bg);
+  box-shadow: inset 0 0 0 1px var(--warn-line);
+  color: var(--warn-ink);
+  font-weight: 600;
+}
+
+/* ---------- workspace: white rounded cards on the sage ---------- */
+:root .results {
+  border-radius: var(--r-widget);
+  background: var(--solid);
+  box-shadow: var(--card-shadow);
+}
+:root .res-head { padding: 20px 16px 12px 20px; border-bottom: 0; }
+:root .res-head h2 { font-size: 1.125rem; font-weight: 600; letter-spacing: 0; }
+:root .res-head p { margin-top: 4px; color: var(--ink-3); font-size: 0.8125rem; font-weight: 500; }
+:root .res-tools .pill-select { min-height: 38px; background-color: var(--fill); }
+:root .icon-btn.filled-soft { background: var(--fill); }
+:root .icon-btn.filled-soft:hover { background: var(--fill-pressed); }
+:root .map-error h2 { font-size: 1.25rem; font-weight: 600; }
+
+/* calendar: a grid of rounded square cells, like the screenshot's */
+:root .cal { margin: 0 12px 8px; padding: 8px 12px 16px; border: 0; border-radius: 18px; background: var(--solid-2); box-shadow: inset 0 0 0 1px var(--hairline); }
+:root .cal > summary { font-weight: 600; }
+:root .cal > summary .low,
+:root .est-sec > summary .low { color: var(--ink-3); font-weight: 500; }
+:root .cal-nav h3 { font-size: 0.9375rem; font-weight: 600; }
+:root .cal-nav .icon-btn { border-radius: var(--r-small); background: var(--solid); box-shadow: inset 0 0 0 1px var(--hairline); }
+:root .cal-nav .icon-btn:hover:not(:disabled) { background: var(--fill); }
+:root .cal-grid { gap: 4px; }
+:root .dow { color: var(--ink-3); font-size: 0.6875rem; font-weight: 600; }
+:root .day { border-radius: 10px; }
+:root .day .dn { font-weight: 600; }
+:root .day .dv { font-weight: 600; }
+:root .day.none { background: var(--fill); color: var(--ink-3); }
+:root button.day:hover { box-shadow: inset 0 0 0 2px currentColor; }
+:root .day.lowest::after { top: 5px; right: 5px; border-left-width: 7px; border-top: 7px solid var(--lowest); }
+:root .day[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--solid), 0 0 0 4.5px var(--picked); }
+:root .day.t1[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px #8A94A1, 0 0 0 2px var(--solid), 0 0 0 4.5px var(--picked); }
+:root button.day.t1:hover { box-shadow: inset 0 0 0 2px currentColor; }
+:root .sw { border-radius: 4px; }
+:root .ramp-key { color: var(--ink-2); font-size: 0.75rem; font-weight: 500; }
+/* Dark: the at-or-below-typical tier steps back to a raised surface in the calendar and its key, so
+   the warm tiers carry the color. Map pills and the map legend stay white: the map doesn't change
+   with the theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) :is(.day.t1, .ramp-key .sw.t1) { background: var(--fill-pressed); color: var(--ink); }
+  :root:not([data-theme="light"]) :is(.day.t1:not([aria-pressed="true"], :hover), .ramp-key .sw.t1) { box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+}
+:root[data-theme="dark"] :is(.day.t1, .ramp-key .sw.t1) { background: var(--fill-pressed); color: var(--ink); }
+:root[data-theme="dark"] :is(.day.t1:not([aria-pressed="true"], :hover), .ramp-key .sw.t1) { box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+
+/* fares: each row is its own soft tile inside the results card */
+:root .applied { padding: 8px 16px 0; }
+:root .list { display: grid; gap: 8px; padding: 8px 12px 14px; }
+:root .list > li {
+  border: 0;
+  border-radius: var(--r-tile);
+  background: var(--solid-2);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  overflow: hidden;
+  transition: box-shadow 0.2s var(--ease);
+}
+:root .list > li:hover { box-shadow: inset 0 0 0 1px var(--hairline-strong), var(--lift); }
+:root .list > li:has([aria-pressed="true"]) { background: var(--solid); box-shadow: inset 0 0 0 2px var(--ink); }
+:root .fare-main { gap: 4px 12px; padding: 12px 16px 8px; border-radius: 0; }
+:root .fare-main:hover { background: transparent; }
+:root .fare-main:active { transform: none; }
+:root .fare-main[aria-pressed="true"] { background: transparent; box-shadow: none; }
+:root .route { font-weight: 600; letter-spacing: 0; }
+:root .pts { font-size: 1.25rem; font-weight: 600; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+:root .unit { color: var(--ink-3); font-weight: 500; }
+:root :is(.cities, .meta, .tax) { color: var(--ink-2); }
+:root .age { color: var(--ink-3); font-size: 0.75rem; font-weight: 500; }
+:root .onmap { color: var(--ink); font-weight: 600; }
+:root .legline .dir,
+:root .leg .dir { color: var(--ink-3); font-weight: 600; }
+:root .actions { padding: 0 16px 12px; gap: 4px 16px; }
+:root .howto ol {
+  padding: 12px 16px 12px 36px;
+  gap: 8px;
+  border-radius: 12px;
+  background: var(--solid);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  line-height: 1.55;
+}
+:root .howto li::marker { color: var(--ink); font-weight: 600; }
+:root .more-rows { padding: 8px 16px 16px; }
+:root .foot-note { padding: 4px 20px 20px; color: var(--ink-3); line-height: 1.55; }
+
+/* tags: small rounded pastel chips (the screenshot's green "Online" style) */
+:root .tag {
+  padding: 2px 8px;
+  border-radius: var(--r-tag);
+  background: var(--mint);
+  box-shadow: none;
+  color: var(--mint-ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+:root .tag.est {
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-style: italic;
+  outline: 1px dashed currentColor;
+  outline-offset: -1px;
+}
+
+/* estimates: their own dashed, hatched card, apart from real fares */
+:root .est-sec,
+:root .est-day { border-radius: 18px; outline-color: var(--hairline-strong); }
+:root .est-sec { margin: 8px 12px 16px; }
+:root .est-sec > summary { font-weight: 600; }
+:root .est-day h3 { font-size: 1.125rem; font-weight: 600; }
+:root .est-day .ep,
+:root .est-list .ep { font-weight: 600; }
+:root .est-day .ep { font-size: 1.5rem; letter-spacing: 0; }
+:root .est-bar { padding: 12px 16px 0; }
+/* a minor switch, not a primary action: its check mark and "on" carry the state */
+:root .est-bar .chip[aria-pressed="true"] { background: var(--fill); color: var(--ink); box-shadow: none; }
+:root .est-bar .chip[aria-pressed="true"]:hover { background: var(--fill-pressed); }
+:root .est-list details > summary,
+:root .est-why { border-radius: 12px; }
+:root .est-why { background: var(--solid-2); }
+:root .pat li { border-radius: 12px; background: var(--solid-2); box-shadow: inset 0 0 0 1px var(--hairline); }
+:root .day.est { background: repeating-linear-gradient(135deg, var(--fill-pressed) 0 3px, transparent 3px 7px); }
+
+/* explore and routes rows (tiles via .list > li above) */
+:root .dest { padding: 12px 16px; border-radius: 0; }
+:root .dest:hover { background: transparent; }
+:root .dest:active { transform: none; }
+:root .dest .name { font-weight: 600; }
+:root .dest .dp { font-size: 1.125rem; font-weight: 600; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+:root .dest .dp small { color: var(--ink-3); font-weight: 600; }
+:root .routes-tools { padding: 12px 16px 8px; }
+:root .detail-head { padding: 12px 20px 16px; }
+:root .detail-head h3 { font-size: 1.5rem; font-weight: 600; letter-spacing: 0; line-height: 1.15; }
+:root .detail-head h3 span { font-size: 0.875rem; font-weight: 600; letter-spacing: 0; color: var(--ink-3); }
+:root .trip { padding: 12px 16px; }
+
+/* skeleton and empty states */
+:root .skel-row i,
+:root .skel-cal i { border-radius: 10px; }
+:root .empty { padding: 40px 24px; }
+:root .empty:not(:has(h3)) { padding: 4px 20px 24px; }   /* sits right under the panel's own heading */
+:root .empty h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0; }
+:root .empty p { color: var(--ink-2); line-height: 1.6; }
+:root .legal-foot { padding: 16px 20px 24px; border-top: 0; color: var(--ink-3); line-height: 1.6; }
+:root .upsell ul { color: var(--ink-2); line-height: 1.6; }
+
+/* ---------- map chrome ---------- */
+:root .legend { padding: 12px 16px; border-radius: var(--r-tile); }
+:root .legend h2 { font-size: 0.8125rem; font-weight: 600; }
+:root .legend ul { font-size: 0.75rem; font-weight: 500; }
+:root .plabel {
+  padding: 2px 8px;
+  border-radius: var(--r-tag);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  box-shadow: 0 0 0 1.5px #0A1220, 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+}
+:root .plabel.sel { font-size: 0.75rem; box-shadow: 0 0 0 2px #ffffff, 0 4px 10px -3px rgba(0, 0, 0, 0.6); }
+:root .plabel.hot { box-shadow: 0 0 0 2px #ffffff, 0 6px 14px -4px rgba(0, 0, 0, 0.6); }
+
+/* toast: the screenshot's dark bottom-right toast, with its green dot */
+:root .toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 12px 12px;
+  border-radius: var(--r-control);
+  background: var(--bubble);
+  color: var(--bubble-ink);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 14px 30px -12px rgba(0, 0, 0, 0.5);
+}
+:root .toast::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #4fcf7a; }
+
+/* ---------- deals: neutral tiles ---------- */
+:root .deals-tools {
+  gap: 12px 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--solid);   /* it sticks to the top of the list as the cards scroll under it */
+}
+:root .deals-age { padding: 12px 20px 0; color: var(--ink-3); font-weight: 500; }
+:root .deals-stale { margin: 12px 16px 0; border-radius: var(--r-tile); box-shadow: inset 0 0 0 1px var(--warn-line); }
+:root .dsec { padding: 24px 16px 8px; }
+:root .dsec > h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0; line-height: 1.2; }
+:root .dsec > p { margin: 4px 0 16px; color: var(--ink-2); font-size: 0.8125rem; line-height: 1.55; }
+/* hub table rows as separate rounded tiles */
+:root .hubs-scroll { margin: 0; }
+:root .hubs { border-collapse: separate; border-spacing: 0 8px; }
+:root .hubs thead th { padding: 0 12px; border-bottom: 0; color: var(--ink-3); font-size: 0.75rem; font-weight: 600; }
+:root .hubs tbody tr + tr { border-top: 0; }
+:root .hubs tbody :is(th, td) { padding: 12px; background: var(--fill); }
+:root .hubs tbody tr :is(th, td):first-child { border-radius: var(--r-tile) 0 0 var(--r-tile); }
+:root .hubs tbody tr :is(th, td):last-child { border-radius: 0 var(--r-tile) var(--r-tile) 0; }
+:root .hub-code { font-weight: 600; font-size: 1rem; }
+:root .hub-city,
+:root .hub-ctry,
+:root .hub-meta,
+:root .hub-tax { color: var(--ink-3); }
+:root .hub-to b { font-weight: 600; }
+:root .hub-pts b { font-size: 1.125rem; font-weight: 600; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+:root .hub-next .hub-link {
+  padding: 2px 8px;
+  border-radius: var(--r-tag);
+  background: var(--solid);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+:root .hub-next .hub-link:hover { background: var(--fill-pressed); }
+/* region cards */
+:root .dgrid { gap: 12px; margin-bottom: 16px; }
+:root .dcard {
+  position: relative;
+  padding: 4px 0 8px;
+  border-radius: var(--r-widget);
+  background: var(--solid-2);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  transition: box-shadow 0.2s var(--ease);
+}
+:root .dcard:hover { box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+:root .dcard h4 { padding: 12px 16px 4px; font-size: 1rem; font-weight: 600; letter-spacing: 0; }
+:root .dcard h4 span { font-size: 0.8125rem; font-weight: 600; color: var(--ink-3); }
+:root .dcard h5 { margin: 12px 16px 4px; color: var(--ink-3); font-size: 0.75rem; font-weight: 600; }
+:root .dlist { padding: 0 8px; }
+:root .dlist > li + li { border-top-color: var(--hairline); }
+:root .deal { padding: 8px 8px 4px; }
+:root .deal .pts { font-size: 1.0625rem; }
+:root .dnote { font-weight: 600; }
+:root .deal-foot .dage { color: var(--ink-3); font-weight: 500; }
+:root .dcard .btn-text { color: var(--ink); }
+:root .dhidden { color: var(--ink-3); }
+/* Rules of thumb: a dark card, like the screenshot's chat bubble */
+:root .rules {
+  --ink: var(--bubble-ink); --ink-2: var(--bubble-ink-2); --ink-3: var(--bubble-ink-3); --tint: var(--bubble-ink);
+  margin: 8px 16px 16px;
+  padding: 20px 20px 12px;
+  border-radius: var(--r-widget);
+  background: var(--bubble);
+  color: var(--bubble-ink);
+  box-shadow: var(--card-shadow);
+}
+:root .rules h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: 0; }
+:root .rules ol { gap: 12px; padding-left: 1.4rem; line-height: 1.55; }
+:root .rules li::marker { color: var(--bubble-ink); font-weight: 600; }
+:root .rules p { line-height: 1.55; }
+:root .rules:focus-visible { outline-color: var(--focus); }
+@media (min-width: 1100px) {
+  :root .rules { top: 96px; margin: 24px 16px 16px 0; }
+}
+
+/* entrance: tiles rise in softly, one after another */
+@keyframes d-rise { from { opacity: 0; transform: translateY(10px); } }
+:root :is(.list > li, .dgrid > .dcard) { animation: d-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+:root :is(.list > li, .dgrid > .dcard):nth-child(2) { animation-delay: 50ms; }
+:root :is(.list > li, .dgrid > .dcard):nth-child(3) { animation-delay: 100ms; }
+:root :is(.list > li, .dgrid > .dcard):nth-child(4) { animation-delay: 150ms; }
+:root :is(.list > li, .dgrid > .dcard):nth-child(5) { animation-delay: 200ms; }
+:root :is(.list > li, .dgrid > .dcard):nth-child(n+6) { animation-delay: 250ms; }
+
+/* ---------- touch and phone ---------- */
+@media (pointer: coarse) {
+  :root :is(.chip, .btn, .pill-select.small, .ret-head .seg button, .theme-seg button) { min-height: 44px; }
+  :root .switch input { width: 46px; height: 28px; }
+  :root .switch input::after { width: 24px; height: 24px; }
+  :root .switch input:checked::after { transform: translateX(18px); }
+}
+@media (max-width: 820px) {
+  :root .res-head { padding: 16px 12px 12px 16px; }
+  :root .list { padding: 8px 8px 12px; }
+  :root .cal { margin: 0 8px 8px; padding: 8px 8px 12px; }
+  :root .dsec { padding: 16px 12px 8px; }
+  :root .deals-tools { padding: 12px; }
+  :root .rules { margin: 8px 12px 16px; padding: 16px 16px 8px; }
+}
+@container hubs (max-width: 44rem) {
+  :root .hubs tbody :is(th, td) { padding: 8px 12px; }
+  :root .hubs tbody tr :is(th, td):first-child { border-radius: var(--r-tile) var(--r-tile) 0 0; }
+  :root .hubs tbody tr :is(th, td):last-child { border-radius: 0 0 var(--r-tile) var(--r-tile); }
+}
+/* Increase Contrast: real outlines everywhere a soft shadow drew the edge. */
+@media (prefers-contrast: more) {
+  :root :is(.console, .results, .menu, .listbox, .legend, .round-btn, .profile, .filters-btn, .pill, .list > li, .cal, .dcard) {
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  :root :is(.input, .pill-select, .combo-box, .chip, .btn, .swap) { box-shadow: inset 0 0 0 1.5px var(--ink); }
+  :root .plabel { box-shadow: 0 0 0 2px var(--ink); }
+  :root .map-tip { box-shadow: 0 0 0 2px var(--bubble-ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root :is(.list > li, .dgrid > .dcard, .wrap main) { animation: none; }
+  :root :is(.dcard, .list > li) { transition: none; }
+}
+
+/* =====================================================================
+   Map page layout: every control floats over the full-screen map
+   ===================================================================== */
+:root {
+  --edge: max(16px, env(safe-area-inset-left));
+  --edge-r: max(16px, env(safe-area-inset-right));
+  --edge-t: max(16px, env(safe-area-inset-top));
+  --edge-b: max(16px, env(safe-area-inset-bottom));
+  --top-h: 92px;           /* the search bar's bottom edge; the page script keeps it current */
+  --space: #06090f;        /* the map's space, the same in light and dark */
+  --panel-w: clamp(340px, 30vw, 430px);
+  --i-filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M3 5.5h8M15 5.5h2M3 14.5h2M9 14.5h8'/%3E%3Ccircle cx='13' cy='5.5' r='2'/%3E%3Ccircle cx='7' cy='14.5' r='2'/%3E%3C/svg%3E");
+}
+body.app { height: 100dvh; overflow: hidden; background: var(--space); }
+
+/* the map */
+.app .map-frame { position: fixed; inset: 0; z-index: 0; background: var(--space); }
+.app #map { position: absolute; inset: 0; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
+.app #map:focus-visible { outline: 3px solid #9fd3b4; outline-offset: -3px; }
+.app #map.grabbing { cursor: grabbing; }
+.app #map.pointing { cursor: pointer; }
+.gmap-gl { position: absolute; inset: 0; }
+.app #map .maplibregl-canvas-container.maplibregl-interactive { cursor: inherit; }
+.app #map .maplibregl-canvas-container.maplibregl-interactive:active { cursor: grabbing; }
+.gmap canvas { position: absolute; inset: 0; display: block; }
+.gmap-over { pointer-events: none; }
+.gmap-pills { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.gmap-pills .plabel { pointer-events: auto; }
+.gmap-pills .plabel.off { pointer-events: none; }
+.map-tip {
+  position: absolute; left: 0; top: 0; z-index: 4; max-width: 18rem; padding: 8px 12px;
+  border-radius: 12px; background: var(--bubble); color: var(--bubble-ink);
+  font-size: 0.8125rem; font-weight: 600; line-height: 1.4; pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 24px -10px rgba(0, 0, 0, 0.6);
+}
+.map-tip b { font-weight: 600; }
+
+/* round buttons: the map controls (white, floating) */
+.app .round-btn, .app .filters-btn, .app .profile {
+  display: inline-grid; place-items: center; flex: none; padding: 0; border: 0; border-radius: var(--r-control);
+  background: var(--solid); color: var(--ink); box-shadow: var(--glass-shadow); cursor: pointer;
+  transition: background-color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.app :is(.round-btn, .filters-btn, .profile):hover { background: var(--solid-2); }
+.app :is(.round-btn, .filters-btn, .profile):active { transform: scale(0.97); }
+.app :is(.round-btn, .filters-btn)[aria-expanded="true"],
+.app .round-btn[aria-pressed="true"] { background: var(--tint-fill); color: var(--on-tint); }
+
+/* ---------- the control panel (#console): one white card, rows stacked ----------
+   Desktop: row 1 is the profile tile and the search fields (From/To, Depart, Search), row 2 the
+   search pills (trip type, cabin, card). Filters and … stack in a column at the panel's right end and
+   Appearance sits in the … menu (the page script moves them; see placeControls). Phone: the
+   sheet keeps them in the form and on the panel. All are --ctl (44 px), the height of the field
+   pills; the profile tile is centred on the From pill (--acct-y, kept current by the script). */
+:root { --ctl: 44px; }
+.app .console .profile, .app .console .filters-btn, .app .console .menu-wrap .round-btn {
+  width: var(--ctl); height: var(--ctl); background: var(--fill); box-shadow: none; text-decoration: none;
+}
+.app .console :is(.profile, .filters-btn, .menu-wrap .round-btn):hover { background: var(--fill-pressed); }
+.app .console :is(.filters-btn, .menu-wrap .round-btn)[aria-expanded="true"] { background: var(--tint-fill); color: var(--on-tint); }
+.app .profile[hidden] { display: none; }
+/* the place box's rounded ring shows focus; no second square one on the input inside it */
+.app .combo-box .combo-input:focus-visible { outline: none; }
+
+/* profile tile: a person icon (Sign in is its name), initials once signed in */
+.app .profile { position: relative; }
+.app .profile .avatar {
+  display: grid; place-items: center; width: 20px; height: 20px; background: currentColor;
+  -webkit-mask: var(--i-person) center / contain no-repeat; mask: var(--i-person) center / contain no-repeat;
+}
+.app .console .profile.has-initials { background: var(--tint-fill); color: var(--on-tint); }
+.app .profile.has-initials .avatar {
+  width: auto; height: auto; background: none; -webkit-mask: none; mask: none;
+  font-size: 0.9375rem; font-weight: 600; letter-spacing: 0.02em;
+}
+.app .profile.pro::after {
+  content: "Pro"; position: absolute; right: -4px; bottom: -4px; padding: 1px 6px; border-radius: var(--r-tag);
+  background: var(--tint-fill); color: var(--on-tint); box-shadow: 0 0 0 2px var(--solid); font-size: 0.625rem; font-weight: 600;
+}
+.app .profile-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.app .menu-wrap { position: relative; }
+.app .menu { top: calc(100% + 10px); }
+/* appearance: a segmented pill like the trip type */
+.app .theme-seg { display: inline-flex; align-self: center; justify-self: start; }
+.app .theme-seg button { min-height: 36px; padding: 0 14px; font-size: 0.8125rem; }
+
+/* the search form inside the panel */
+.app .search { position: static; margin: 0; padding: 0; background: none; box-shadow: none; }
+.app .search .bar {
+  min-width: 0; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px;
+  padding: 0; border-radius: 0; background: none; box-shadow: none;
+}
+.app .search .places { flex: 3 1 300px; gap: 4px; }
+.app .search .combo-input { flex-basis: 5ch; min-width: 5ch; }
+.app .search .pchip .pl { max-width: 8em; }
+.app .search .dates { flex: 1 1 236px; }
+.app .search .date-row { gap: 4px; }
+.app .search input[type="date"].input { padding: 0 8px 0 12px; }
+.app .search .ret { flex: 1 1 230px; }
+.app .search .month-field { flex: 1 1 170px; }
+.app .search .opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 0 1 auto; min-height: 44px; }
+.app .search .opts .seg button { padding: 0 12px; font-size: 0.8125rem; }
+.app .search #cabin { width: 8.25rem; }
+.app .search #card { width: 9.5rem; }
+.app .search .opts .pill-select { text-overflow: ellipsis; }
+.app .search .go { flex: none; min-height: var(--ctl); }
+.app .search .combo > .flabel { min-height: 0; margin-bottom: 4px; }
+.app .search .ret-head { min-height: 26px; }
+.app .filters-btn #more-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.app .filters-btn { position: relative; }
+.app .filters-btn[data-count]::after {
+  content: attr(data-count); position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: var(--r-tag); background: var(--tint-fill); color: var(--on-tint); box-shadow: 0 0 0 2px var(--solid); font-size: 0.6875rem; font-weight: 600; line-height: 20px;
+}
+@media (min-width: 821px) {
+  .app .console {
+    position: fixed; z-index: 20; top: var(--edge-t); left: var(--edge); right: var(--edge-r);
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: 1fr 1fr; align-items: start; gap: 12px 0;
+    grid-template-areas: "acct form filt" "acct form menu";
+    padding: 12px 16px 12px 12px; border-radius: 28px; background: var(--solid); box-shadow: var(--glass-shadow);
+  }
+  .app .console > .pill { display: none; }
+  .app .console > .profile { grid-area: acct; margin: var(--acct-y, 30px) 8px 0 0; }
+  .app .console > .search { grid-area: form; min-width: 0; container: sform / inline-size; }
+  .app .console > .filters-btn { grid-area: filt; align-self: end; margin-left: 12px; }
+  .app .console > .menu-wrap { grid-area: menu; align-self: start; margin-left: 12px; }
+  body:not([data-mode="search"]) .console { grid-template-rows: auto; grid-template-areas: "acct form menu"; }
+  body:not([data-mode="search"]) .console > .menu-wrap { align-self: center; }
+  body:not([data-mode="search"]) .console > .filters-btn { display: none; }
+  .app .console .menu { left: auto; right: 0; transform-origin: top right; }
+  .app .menu #theme-l {
+    position: static; display: block; width: auto; height: auto; margin: 0 0 8px; overflow: visible; clip: auto; clip-path: none;
+    color: var(--ink); font-size: 0.8125rem; font-weight: 600; white-space: normal;
+  }
+  .app .menu .theme-seg { display: flex; width: fit-content; margin-bottom: 14px; }
+  body[data-mode="routes"] .console > .search { container-type: normal; }   /* sized by its pills */
+  body[data-mode="routes"] .search .opts { flex-wrap: nowrap; }
+  /* Deals: no search form, so the profile tile and … sit in the panel's top right corner. */
+  body.app[data-mode="deals"] .console {
+    left: auto; right: calc(var(--edge-r) + 12px); top: calc(var(--edge-t) + 12px);
+    grid-template-columns: auto auto; grid-template-areas: "acct menu"; gap: 0;
+    padding: 0; border-radius: 0; background: none; box-shadow: none;
+  }
+  body[data-mode="deals"] .console > .search { display: none; }
+  body[data-mode="deals"] .console > .profile { margin: 0; }
+  body[data-mode="deals"] .console > .menu-wrap { margin-left: 8px; }
+  body[data-mode="deals"] .res-head { padding-right: 120px; }
+  /* The full color key is on the map legend; the calendar keeps only what the legend doesn't explain. */
+  body:has(.legend:not([hidden])) .ramp-key li:not(:has(.sw.est)) { display: none; }
+  body:has(.legend:not([hidden])) .ramp-key:not(:has(.sw.est)) { display: none; }
+  /* The fields keep one structure from 821 to 1440 px: From/To, Depart and Search on the first row;
+     trip type, cabin, card and filters on the second (round trips put Return under Depart in
+     between). A narrow form (container query, in rem so it follows the text size) gives From/To
+     the whole first row. */
+  .app .search .bar {
+    display: grid; align-items: end; gap: 8px 12px;
+    grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 1fr) auto;
+    grid-template-areas: "places dates go" "opts opts opts";
+  }
+  body.app[data-trip="rt"] .search .bar { grid-template-areas: "places dates go" ". ret ." "opts opts opts"; }
+  .app .search .bar > * { min-width: 0; }
+  .app .search .places { grid-area: places; }
+  .app .search .dates { grid-area: dates; }
+  .app .search .ret { grid-area: ret; }
+  .app .search .opts { grid-area: opts; }
+  .app .search .go { grid-area: go; }
+  .app .search .ret .nights-row { justify-content: flex-start; }
+  body[data-mode="routes"] .search .bar { display: flex; }
+  .app .search .more {
+    position: absolute; z-index: 5; top: calc(100% + 10px); left: 0; right: 0;
+    max-height: calc(100dvh - var(--top-h) - 40px); overflow-y: auto;
+    background: var(--solid); box-shadow: 0 0 0 1px var(--hairline), var(--glass-shadow); border-radius: var(--r-tile);
+  }
+  .app .search .form-error { position: absolute; z-index: 4; top: calc(100% + 10px); left: 0; box-shadow: var(--glass-shadow); }
+}
+@media (min-width: 821px) {
+  @container sform (max-width: 52rem) {
+    .app .search .bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "places places" "dates go" "opts opts"; }
+    body.app[data-trip="rt"] .search .bar { grid-template-areas: "places places" "dates ret" "opts opts" "go go"; }
+    .app .search .go { justify-self: start; }
+  }
+}
+
+/* the results panel: floats on the left, from below the search bar to just above the bottom row
+   (logo and mode bar), so neither ever sits on top of a result */
+.app .sheet, .app .sheet-body { display: contents; }
+.app .results {
+  position: fixed; z-index: 10; left: var(--edge); top: calc(var(--top-h) + 12px); bottom: calc(var(--edge-b) + 64px);
+  width: var(--panel-w); border-radius: var(--r-widget);
+  box-shadow: var(--glass-shadow);
+}
+.app .res-scroll { padding-bottom: 16px; }
+.app .results .notice { margin: 12px 12px 0; }
+body[data-mapwide="1"]:not([data-mode="deals"]) .results { display: none; }
+/* Deals: a reading panel edge to edge, in the search bar's place */
+body[data-mode="deals"] .results {
+  left: var(--edge); top: var(--edge-t); width: calc(100vw - var(--edge) - var(--edge-r));
+}
+
+/* the mode bar: dark, floating at the bottom center */
+.app .sheet-head {
+  position: fixed; z-index: 30; left: 50%; bottom: var(--edge-b); transform: translateX(-50%);
+}
+.app .handle, .app .logo-mark, .app .show-map { display: none; }
+.app .mode-row { display: flex; align-items: center; gap: 10px; }
+.app .modebar {
+  display: flex; gap: 4px; padding: 6px; border-radius: var(--r-tile); background: var(--rail);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 22px 40px -18px rgba(0, 0, 0, 0.6);
+}
+.app .modebar button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 12px;
+  border: 0; border-radius: 10px; background: transparent; color: var(--rail-ink);
+  font-weight: 600; font-size: 0.875rem; cursor: pointer; white-space: nowrap;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.app .modebar button:hover { background: rgba(255, 255, 255, 0.1); color: #ffffff; }
+.app .modebar button[aria-pressed="true"] { background: #ffffff; color: #1e2220; }
+.app .modebar button:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+.app .modebar .mi {
+  flex: none; width: 18px; height: 18px; background: currentColor;
+  -webkit-mask: var(--mode-icon) center / contain no-repeat; mask: var(--mode-icon) center / contain no-repeat;
+}
+.app .modebar [data-set-mode="search"] { --mode-icon: var(--i-search); }
+.app .modebar [data-set-mode="routes"] { --mode-icon: var(--i-routes); }
+.app .modebar [data-set-mode="deals"] { --mode-icon: var(--i-deals); }
+
+/* the logo: a small pill at the bottom left */
+.app .logo-pill {
+  position: fixed; z-index: 30; left: var(--edge); bottom: calc(var(--edge-b) + 8px);
+  display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: var(--r-control);
+  background: var(--solid); color: var(--ink); box-shadow: var(--glass-shadow);
+  font-size: 0.875rem; font-weight: 600; letter-spacing: 0; pointer-events: none;
+}
+.app .logo-pill .globe-mark, .app .logo-mark .globe-mark {
+  box-sizing: content-box; width: 20px; height: 20px; padding: 6px; border-radius: 50%; background: #1e2220; color: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .app .logo-pill .globe-mark { background: #ffffff; color: #1e2220; }
+}
+:root[data-theme="dark"] .app .logo-pill .globe-mark { background: #ffffff; color: #1e2220; }
+
+/* map controls, legend, attribution */
+.app .map-ctl { position: fixed; z-index: 10; right: var(--edge-r); top: calc(var(--top-h) + 12px); display: grid; gap: 8px; }
+.app .map-ctl .round-btn { width: 44px; height: 44px; }
+body[data-mode="deals"] :is(.map-ctl, .legend) { display: none !important; }
+.app .legend {
+  position: fixed; z-index: 10; right: var(--edge-r); bottom: calc(var(--edge-b) + 22px); left: auto; max-width: 17rem;
+  padding: 12px 16px; border-radius: var(--r-tile); background: var(--solid); box-shadow: var(--glass-shadow);
+}
+.app .legend h2 { margin: 0 0 8px; font-size: 0.8125rem; font-weight: 600; }
+.app .legend ul { display: grid; gap: 4px; font-size: 0.75rem; font-weight: 500; color: var(--ink-2); }
+.app .legend li { display: flex; align-items: center; gap: 8px; }
+.app .legend li b { color: var(--ink); font-weight: 600; }
+.app .legend .sw { width: 22px; height: 12px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(10, 18, 32, 0.25); }
+.app .legend .sw.t1 { box-shadow: inset 0 0 0 1.5px #8A94A1; }
+.app .legend .sw.round { width: 12px; }
+.app .attrib {
+  position: fixed; z-index: 10; right: var(--edge-r); bottom: max(4px, env(safe-area-inset-bottom)); margin: 0;
+  color: rgba(220, 228, 242, 0.82); font-size: 0.6875rem; font-weight: 600;
+}
+.app .attrib a { color: inherit; }
+.app .map-frame.no-land .attrib { color: #ffd59a; }
+.app .map-error { color: #d3dbd6; }
+.app .toast { bottom: calc(var(--edge-b) + 76px); }
+
+/* ---------- phone: the map is home, a bottom sheet holds the search and results ---------- */
+@media (max-width: 820px) {
+  body[data-sheet="open"] .map-ctl { visibility: hidden; }
+  :root { --head-h: calc(56px + 3rem); --peek: calc(var(--head-h) + env(safe-area-inset-bottom)); }
+  .app .sheet {
+    position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; top: calc(max(12px, env(safe-area-inset-top)) + 32px);
+    display: flex; flex-direction: column; border-radius: 26px 26px 0 0;
+    background: var(--solid); box-shadow: 0 -12px 34px -14px rgba(0, 0, 0, 0.6);
+    transform: translateY(calc(100% - var(--peek))); transition: transform 0.38s var(--ease);
+  }
+  body[data-sheet="open"] .sheet { transform: none; }
+  .app .sheet.dragging { transition: none; }
+  .app .sheet-head {
+    position: relative; left: auto; bottom: auto; transform: none; flex: none; height: var(--head-h);
+    padding: 0 12px 10px; touch-action: none; cursor: grab;
+  }
+  .app .handle {
+    display: grid; place-items: center; width: 100%; height: 36px; padding: 0; border: 0; background: none; cursor: grab;
+  }
+  .app .handle .grip { width: 40px; height: 5px; border-radius: 999px; background: var(--hairline-strong); }
+  .app .handle:focus-visible { outline-offset: -4px; border-radius: 12px; }
+  .app .logo-mark { display: block; flex: none; }
+  .app .logo-mark .globe-mark { width: 26px; height: 26px; padding: 9px; }
+  .app .mode-row { gap: 8px; }
+  .app .modebar { flex: 1 1 auto; min-width: 0; padding: 4px; gap: 2px; }
+  .app .modebar button {
+    flex: 1 1 0; min-width: 0; flex-direction: column; justify-content: center; gap: 2px;
+    min-height: 50px; padding: 4px 2px; font-size: 0.6875rem;
+  }
+  body[data-sheet="open"] .app .show-map, body[data-sheet="open"] .show-map {
+    position: absolute; top: 2px; right: 12px; display: inline-flex; align-items: center; gap: 4px;
+    min-height: 32px; padding: 0 12px; border: 0; border-radius: var(--r-small); background: var(--fill); color: var(--ink);
+    font-weight: 600; font-size: 0.8125rem; cursor: pointer;
+  }
+  body[data-sheet="open"] .logo-mark { display: none; }
+  /* The place list spans the sheet (it sits over the swap button), short enough to clear the keyboard. */
+  .app .search .listbox {
+    width: calc(100vw - 24px); max-width: none; max-height: min(24rem, 42dvh);
+    overflow-x: hidden; touch-action: pan-y pinch-zoom;
+  }
+  html { overflow-x: clip; }
+  .app .sheet-body {
+    display: block; flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
+    touch-action: pan-y pinch-zoom;
+    padding: 4px 12px calc(28px + env(safe-area-inset-bottom));
+  }
+  body[data-sheet="closed"] .sheet-body { visibility: hidden; transition: visibility 0s 0.38s; }
+  /* The panel in the sheet: the summary pill with the profile tile, the form when open, then
+     appearance and the … menu (the menu sits beside the profile while the form is closed). */
+  .app .console {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px 8px;
+    grid-template-areas: "pill acct menu" "form form form"; margin: 0 0 12px;
+  }
+  .app .console:has(> .search.open) { grid-template-areas: "pill pill acct" "form form form" "theme theme menu"; }
+  .app .console > .pill { grid-area: pill; }
+  .app .console > .profile { grid-area: acct; }
+  .app .console > .search { grid-area: form; }
+  .app .console > .theme-seg { grid-area: theme; }
+  .app .console > .menu-wrap { grid-area: menu; }
+  .app .console:not(:has(> .search.open)) > .theme-seg { display: none; }
+  body[data-mode="deals"] .app .console { grid-template-areas: "acct theme menu"; }
+  body[data-mode="deals"] .app .console > .theme-seg { display: inline-flex; justify-self: center; }
+  .app .theme-seg button { min-height: 44px; }
+  .app .pill { display: flex; width: 100%; min-height: var(--ctl); margin: 0; padding-block: 6px; background: var(--fill); box-shadow: none; }
+  body[data-mode="deals"] .pill { display: none; }
+  /* The form keeps one structure from 320 to 820 px and at 200% text: one column of rows (From,
+     To, Depart, Return, trip type, cabin + card, Search), each row a grid that shares its width.
+     Pairs only stack (container query below, in rem so it follows the text size) when the form is
+     too narrow for them side by side. */
+  .app .search { position: static; display: block; margin: 0; container: sform / inline-size; }
+  .app .search:not(.open) { display: none; }
+  .app .search .bar {
+    display: grid; grid-template-columns: minmax(0, 1fr); padding: 0; border-radius: 0; background: none; box-shadow: none; gap: 12px;
+  }
+  .app .search .bar > * { min-width: 0; }
+  .app .search .places { gap: 8px; }
+  .app .search .places .swap { width: 44px; height: 44px; }
+  .app .search .ret-head { flex-wrap: wrap; row-gap: 6px; }
+  .app .search .ret-head .pill-select.small { flex: 0 1 auto; max-width: min(15rem, 100%); }
+  .app .search .date-row { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .app .search .nights-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: center; }
+  .app .search .nights-row .input { width: 100%; }
+  .app .search .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .app .search .opts .seg { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+  .app .search .opts .seg button { min-width: 0; white-space: normal; line-height: 1.2; padding: 4px 8px; }
+  .app .search #cabin, .app .search #card { width: 100%; max-width: none; text-overflow: ellipsis; }
+  .app .search .go { width: 100%; }
+  .app .console .filters-btn {
+    grid-column: 1 / -1; justify-self: start; display: inline-flex; gap: 8px; width: auto; height: auto;
+    min-height: 44px; padding: 0 16px; border-radius: var(--r-control); font-weight: 600;
+  }
+  .app .filters-btn #more-label { position: static; width: auto; height: auto; clip: auto; clip-path: none; }
+  .app .search .more { position: static; max-height: none; margin-top: 12px; box-shadow: inset 0 0 0 1px var(--hairline); background: var(--solid-2); }
+  .app .search .form-error { position: static; margin-top: 12px; box-shadow: none; }
+  .app .results, body[data-mode="deals"] .results {
+    position: static; width: auto; border-radius: 0; background: none; box-shadow: none; overflow: visible;
+  }
+  .app .res-head { padding: 8px 4px 12px; }
+  /* the summary pill just above already says the route, dates, cabin and card */
+  body.app[data-mode="search"] .res-head p:not(:empty) { display: none; }
+  .app .res-tools { min-width: 0; max-width: 100%; }
+  .app .res-tools .pill-select { flex: 0 1 auto; min-width: 0; }
+  .app .res-scroll { overflow: visible; padding-bottom: 0; }
+  .app .results .notice { margin: 0 0 12px; }
+  body[data-mapwide="1"]:not([data-mode="deals"]) .results { display: flex; }
+  .app .list { padding: 0 0 12px; }
+  .app .cal { margin: 0 0 8px; }
+  .app .logo-pill { display: none; }
+  .app .map-ctl { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
+  .app .map-ctl .wide-btn { display: none; }
+  .app .legend {
+    left: 12px; right: 12px; bottom: calc(var(--peek) + 26px); max-width: none; padding: 8px 12px; border-radius: 14px;
+  }
+  .app .legend h2 { margin-bottom: 6px; font-size: 0.75rem; }
+  .app .legend ul { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .app .legend .note { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .app .attrib { bottom: calc(var(--peek) + 6px); right: 14px; }
+  .app .toast { bottom: calc(var(--peek) + 16px); }
+}
+@container sform (max-width: 19.5rem) {
+  .app .search .date-row { grid-template-columns: minmax(0, 1fr); }
+  .app .search .date-row .to { display: none; }
+  .app .search .nights-row { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .app .search .nights-row .hint { display: none; }   /* "Nights" is pressed just above */
+  .app .search .ret-head .pill-select.small, .app .search .ret-head .seg { flex: 1 1 100%; max-width: none; }
+  .app .search .ret-head .seg { display: grid; grid-template-columns: 1fr 1fr; }
+  .app .search .opts { grid-template-columns: minmax(0, 1fr); }
+}
+.sab-probe { position: fixed; left: 0; bottom: 0; width: 0; height: env(safe-area-inset-bottom, 0px); visibility: hidden; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .app .sheet { transition: none; }
+}
+
+/* =====================================================================
+   Account and legal pages (site.css): the same sage canvas, the document
+   in one white rounded card, a round icon-pill header nav
+   ===================================================================== */
+
+:root body:has(> .wrap) {
+  background: var(--bg);
+  font: 500 0.9375rem/1.65 var(--font);
+  letter-spacing: 0;
+  word-spacing: 0.08em;
+  -webkit-font-smoothing: antialiased;
+}
+:root .wrap { max-width: 50rem; padding: 0 max(16px, env(safe-area-inset-right)) 96px max(16px, env(safe-area-inset-left)); }
+:root .wrap .top {
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: max(20px, env(safe-area-inset-top)) 0 20px;
+}
+:root .wrap .top a.brand {
+  gap: 12px;
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+:root .wrap .top a.brand svg { border-radius: 50%; box-shadow: var(--card-shadow); }
+:root .wrap .top a.brand svg rect { rx: 16px; fill: #1e2220; }
+:root .wrap .top nav {
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--r-control);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  font-size: 0.875rem;
+}
+:root .wrap .top nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--r-small);
+  color: var(--ink-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+:root .wrap .top nav a:hover { background: var(--fill); color: var(--ink); }
+:root .wrap main {
+  padding: clamp(22px, 4vw, 44px);
+  border-radius: 26px;
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  animation: d-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+:root .wrap h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.375rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+:root .wrap h2 { margin: 40px 0 8px; font-size: 1.25rem; font-weight: 600; letter-spacing: 0; line-height: 1.25; }
+:root .wrap h3 { margin: 24px 0 6px; font-size: 1rem; font-weight: 600; }
+:root .wrap :is(p, li) { color: var(--ink-2); max-width: 68ch; }
+:root .wrap :is(p, li, h1, h2, h3, td, th, a, code) { overflow-wrap: anywhere; }
+:root .wrap li + li { margin-top: 6px; }
+:root .wrap a { color: var(--tint); font-weight: 600; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+:root .wrap code { padding: 1px 7px; border-radius: var(--r-tag); background: var(--fill); font-size: 0.8125em; font-weight: 600; }
+:root .wrap .muted { color: var(--ink-3); font-size: 0.8125rem; }
+:root .wrap h1 + .muted {
+  display: inline-block;
+  margin: 4px 0 28px;
+  padding: 4px 12px;
+  border-radius: var(--r-tag);
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+:root .wrap .draft {
+  margin: 0 0 28px;
+  padding: 12px 16px;
+  border-radius: var(--r-tile);
+  background: var(--warn-bg);
+  box-shadow: inset 0 0 0 1px var(--warn-line);
+  color: var(--warn-ink);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+:root .wrap .draft strong { font-weight: 600; }
+:root .wrap .notice {
+  padding: 12px 16px;
+  border-left: 0;
+  border-radius: var(--r-tile);
+  background: var(--fill);
+  color: var(--ink-2);
+}
+:root .wrap table { margin: 14px 0 22px; font-size: 0.875rem; border-collapse: separate; border-spacing: 0; }
+:root .wrap :is(th, td) { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); line-height: 1.5; }
+:root .wrap thead th { color: var(--ink-3); font-size: 0.75rem; font-weight: 600; }
+:root .wrap tbody th { color: var(--ink); font-weight: 600; }
+
+/* account page: sections sit directly on the page's one card, plans are neutral tiles */
+:root .wrap .card {
+  margin: 24px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+:root .wrap .card h2 { margin-top: 0; font-size: 1.125rem; }
+:root .wrap .plans { gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); }
+:root .wrap .plan { border-radius: var(--r-widget); background: var(--solid-2); box-shadow: inset 0 0 0 1px var(--hairline); transition: box-shadow 0.2s var(--ease); }
+:root .wrap .plan:hover { box-shadow: inset 0 0 0 1px var(--hairline-strong); }
+:root .wrap .plan h3 { margin: 0; color: var(--ink-3); font-size: 0.8125rem; font-weight: 600; }
+:root .wrap .plan .price { margin: 8px 0 12px; font-size: 1.875rem; font-weight: 600; letter-spacing: 0; line-height: 1.1; }
+:root .wrap .btn {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--hairline-strong);
+  color: var(--ink);
+  font-weight: 600;
+  transition: background-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+:root .wrap .btn:hover { background: var(--fill); }
+:root .wrap .btn:active { transform: scale(0.98); }
+:root .wrap .btn.primary { background: var(--tint-fill); box-shadow: none; color: var(--on-tint); }
+:root .wrap .btn.primary:hover { background: var(--tint-fill); opacity: 0.88; }
+:root .wrap .btn.danger { background: transparent; box-shadow: inset 0 0 0 1.5px var(--bad); color: var(--bad); }
+:root .wrap .btn.danger:hover { background: var(--bad-bg); }
+:root .wrap .btn:disabled { opacity: 0.5; transform: none; }
+:root .wrap .consent { font-size: 0.875rem; line-height: 1.55; }
+:root .wrap .consent input { accent-color: var(--tint-fill); }
+:root .wrap .status { margin: 0 0 8px; color: var(--ink-3); font-size: 0.9375rem; font-weight: 600; }
+:root .wrap .status.err { color: var(--bad); }
+:root .wrap :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+:root footer.site {
+  margin-top: 24px;
+  padding: 20px 8px 0;
+  border-top: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+:root footer.site p { color: var(--ink-2); }
+:root footer.site a { color: var(--ink); font-weight: 600; }
+
+@media (prefers-contrast: more) {
+  :root .wrap :is(main, .card, .btn, .draft, .top nav, .plan) { box-shadow: inset 0 0 0 2px var(--ink); }
+}
+@media (max-width: 40rem) {
+  :root .wrap .top a.brand { font-size: 1.125rem; }
+  :root .wrap .top nav { margin-left: 0; }
+  :root .wrap main { border-radius: 22px; }
+  :root .wrap h2 { margin-top: 32px; }
+}
