@@ -10,3 +10,5 @@
   --rail: #1b2230; --rail-ink: #bcc6d8; --rail-on: #1f5fff; --rail-on-ink: #ffffff;
   --bubble: #222a3a; --bubble-ink-2: #d0d8e6; --bubble-ink-3: #b6c0d2;
 }
+/* design.css hard-codes the active mode tab white */
+:root[data-theme="dark"] .app .modebar button[aria-pressed="true"] { background: #1f5fff; color: #ffffff; }
