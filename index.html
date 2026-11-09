@@ -8,7 +8,13 @@
 <meta name="theme-color" content="#06090f">
 <script>
   // Apply a saved Light/Dark choice before first paint so the page never flashes the wrong theme.
-  try { const t = localStorage.getItem('atlas-theme'); document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark'; } catch {}
+  // With no choice saved the map page opens dark (Night cabin); Auto follows the system.
+  const root = document.documentElement;
+  try { const t = localStorage.getItem('atlas-theme'); if (t === 'light' || t === 'dark') root.dataset.theme = t; else if (t !== 'auto') root.dataset.theme = 'dark'; } catch { root.dataset.theme = 'dark'; }
+  // The home page plays first, at this same address, unless it already holds a search (a shared
+  // link, Back, Routes or Deals): the search page loads under it, then it hands over.
+  try { const p = new URLSearchParams(location.hash.slice(1)); if (!p.get('from') && !p.get('to') && !p.get('mode')) root.dataset.home = '1'; } catch {}
+  if (!root.dataset.home) root.dataset.enter = '1';   // opened straight on a search: the bar drops in, the panels rise
 </script>
 <meta name="description" content="Where To Points: see where your credit card points can fly you. Award seats priced in Amex, Chase, Citi, Capital One and Bilt points, on a map.">
 <title>Where To Points</title>
@@ -798,7 +804,6 @@ body[data-mode="deals"] .search { display: none !important; }
 }
 </style>
 <link rel="stylesheet" href="design.css">
-<link rel="stylesheet" href="demo-theme.css">
 </head>
 <body class="app" data-mode="search" data-trip="ow" data-sheet="closed">
 <a class="skip" href="#results" id="skip-link">Skip to results</a>
@@ -870,8 +875,6 @@ body[data-mode="deals"] .search { display: none !important; }
           <div class="dates only-search" role="group" aria-labelledby="depart-l">
             <div class="ret-head">
               <span class="flabel" id="depart-l">Depart</span>
-              <label class="sr-only" for="month">Flexible: whole month</label>
-              <select class="pill-select small" id="month" name="month"><option value="">Exact dates</option></select>
             </div>
             <div class="date-row">
               <label class="sr-only" for="d1">Earliest departure</label>
@@ -908,10 +911,6 @@ body[data-mode="deals"] .search { display: none !important; }
           </div>
 
           <div class="opts">
-          <div class="seg only-search" role="group" aria-label="Trip type" id="trip">
-            <button type="button" data-v="ow" aria-pressed="true">One way</button>
-            <button type="button" data-v="rt" aria-pressed="false">Round trip</button>
-          </div>
           <label class="sr-only" for="cabin">Cabin</label>
           <select class="pill-select" id="cabin" name="cabin"></select>
           <label class="sr-only" for="card">Pay with</label>
@@ -924,6 +923,18 @@ body[data-mode="deals"] .search { display: none !important; }
           <button type="submit" class="btn filled go not-routes" id="go">Search flights</button>
         </div>
       <div class="more only-search" id="more" hidden>
+        <!-- Trip type and flexible dates live here so the desktop search is one slim bar (Night cabin). -->
+        <div class="field">
+          <span class="flabel" id="trip-l">Trip</span>
+          <div class="seg" role="group" aria-labelledby="trip-l" id="trip">
+            <button type="button" data-v="ow" aria-pressed="true">One way</button>
+            <button type="button" data-v="rt" aria-pressed="false">Round trip</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="flabel" for="month">Dates</label>
+          <select class="pill-select" id="month" name="month"><option value="">Exact dates</option></select>
+        </div>
         <div class="field programs" role="group" aria-labelledby="prog-l" aria-describedby="prog-hint">
           <span class="flabel" id="prog-l">Programs</span>
           <div class="chips" id="programs"></div>
@@ -1027,6 +1038,22 @@ body[data-mode="deals"] .search { display: none !important; }
   <p class="attrib"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap<span class="sr-only"> (opens in a new tab)</span></a> contributors · <a href="https://protomaps.com" target="_blank" rel="noopener">Protomaps<span class="sr-only"> (opens in a new tab)</span></a></p>
 </div>
 
+<!-- The home page (Direction C, "Grand tour"): plays first over the same map while the search page
+     loads under it, then hands over (leaveHome). Decorative, so hidden from assistive tech. -->
+<div class="home" id="home">
+  <div class="home-brand" aria-hidden="true"><svg class="globe-mark" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.6 12h16.8M12 3.4c-3.3 3.6-3.3 13.6 0 17.2M12 3.4c3.3 3.6 3.3 13.6 0 17.2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Where To Points</span></div>
+  <div class="home-hero">
+    <p class="home-ey">Award seats, priced in points</p>
+    <p class="home-h">Where to <em>next?</em></p>
+    <p class="home-lede">Every award fare we’ve seen, on one globe, priced in your card’s points.</p>
+    <button type="button" class="home-go" id="home-go">Start searching<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+</div>
+<!-- Phone: the search as a slim two-line pill on top of the map (Night cabin); it opens the form in the sheet. -->
+<button type="button" class="top-pill" id="top-pill" aria-controls="sheet-body">
+  <span class="tp-text"><b id="tp-1">Search award flights</b><small id="tp-2"></small></span>
+  <span class="tp-go" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+</button>
 <div class="logo-pill" aria-hidden="true"><svg class="globe-mark" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3.6 12h16.8M12 3.4c-3.3 3.6-3.3 13.6 0 17.2M12 3.4c3.3 3.6 3.3 13.6 0 17.2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Where To Points</span></div>
 <div class="sab-probe" id="sab" aria-hidden="true"></div>
 <div class="sr-only" id="live" aria-live="polite"></div>
@@ -1291,6 +1318,94 @@ const GlobeMap = (() => {
   const MAX_DOTTED = 20;    // possible routes drawn at once: the best by value among the dots on screen
   const dottedFilter = codes => ['all', ['==', ['get', 'p'], 1], ['in', ['get', 'code'], ['literal', codes]]];
 
+  // Every 15 degrees, as the intro's engraved globe draws it.
+  const GRATICULE = { type: 'FeatureCollection', features: [] };
+  for (let lon = -180; lon < 180; lon += 15) GRATICULE.features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: Array.from({ length: 33 }, (_, i) => [lon, -80 + i * 5]) } });
+  for (let lat = -75; lat <= 75; lat += 15) GRATICULE.features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: Array.from({ length: 73 }, (_, i) => [-180 + i * 5, lat]) } });
+
+  // ---------- looks: 'map' (land and water colours), 'intro' (the front page's engraved globe) and
+  // 'night' (the dark search page: the map pulled into the home page's navy) ----------
+  // The intro: ink ocean, slate land under a silver hatch, silver coasts and a graticule, no
+  // landcover or city names. Night: the map's land and water at night, landcover faint, a trace of
+  // the engraving's hatch and coasts, so the hand-over from the intro is a small step.
+  // [layer, paint property, map value, intro value, night value]; setLook crossfades them.
+  const INK = { ocean: '#0c1630', land: '#1a2944' };
+  const NIGHT = { ocean: '#0f2342', land: '#34494a' };
+  const LOOK = [
+    ['ocean', 'background-color', waterC, INK.ocean, NIGHT.ocean],
+    ['land', 'fill-color', landC('land'), INK.land, NIGHT.land],
+    ['inland-water', 'fill-color', landC('inland'), INK.land, NIGHT.land],
+    ...Object.keys(COVER).map(kind => ['cover-' + kind, 'fill-opacity', 1, 0, 0.28]),
+    ['land-hatch', 'fill-opacity', 0, 0.4, 0.07],
+    ['major-water', 'fill-color', waterC, INK.ocean, NIGHT.ocean],
+    ['coast', 'line-opacity', 0, 0.7, 0.3],
+    ['graticule', 'line-opacity', 0, 0.12, 0.05],
+    ['country-borders', 'line-color', LINES.country, 'rgba(214,224,240,0.3)', 'rgba(214,224,240,0.32)'],
+    ['region-borders', 'line-color', LINES.region, 'rgba(214,224,240,0)', 'rgba(214,224,240,0.14)'],
+    ['city-dots', 'circle-opacity', 0.65, 0, 0.65],
+    ['city-labels', 'text-opacity', 1, 0, 1],
+    ['country-labels', 'text-color', LINES.textSoft, 'rgba(226,232,242,0.66)', 'rgba(226,232,242,0.74)'],
+  ];
+  // The hatch: one silver diagonal per 9 px tile, which repeats seamlessly.
+  function hatchImage() {
+    const n = 18, c = document.createElement('canvas'); c.width = c.height = n;
+    const g = c.getContext('2d');
+    g.strokeStyle = 'rgba(214,224,240,0.55)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(-1, n + 1); g.lineTo(n + 1, -1); g.moveTo(-1, 1); g.lineTo(1, -1); g.moveTo(n - 1, n + 1); g.lineTo(n + 1, n - 1); g.stroke();
+    return g.getImageData(0, 0, n, n);
+  }
+
+  // ---------- the sky behind the globe ----------
+  // Seeded, so the same stars every visit: a faint milky band with a denser run of small stars in
+  // it, scattered stars in three sizes, and a four-point glint on the brightest.
+  function starField(w, h, dpr) {
+    const c = document.createElement('canvas'); c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+    const g = c.getContext('2d'); g.scale(dpr, dpr);
+    let s = 1013904223;
+    const rnd = () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const band = x => h * (0.82 - 0.6 * x / w) + Math.sin(x / w * 5.5) * h * 0.04;
+    const R = Math.max(w, h) * 0.15;
+    // The field drifts both ways and wraps, so anything across an edge is drawn on the far side too.
+    const wrap = (x, y, r, draw) => {
+      const xs = [x], ys = [y];
+      if (x < r) xs.push(x + w); if (x > w - r) xs.push(x - w);
+      if (y < r) ys.push(y + h); if (y > h - r) ys.push(y - h);
+      for (const a of xs) for (const b of ys) draw(a, b);
+    };
+    for (let i = 0; i < 16; i++) {
+      const x0 = (i + 0.5) / 16 * w, y0 = band(x0);
+      wrap(x0, y0, R, (x, y) => {
+        const gr = g.createRadialGradient(x, y, 0, x, y, R);
+        gr.addColorStop(0, 'rgba(150,172,220,0.045)'); gr.addColorStop(1, 'rgba(150,172,220,0)');
+        g.fillStyle = gr; g.fillRect(x - R, y - R, 2 * R, 2 * R);
+      });
+    }
+    const n = Math.round(w * h / 1050);   // Night cabin: a dense sky
+    const bright = [];   // the brightest, which twinkle on the home page (phase and speed from the index)
+    const pts = [];      // every star once, for the motion streaks
+    for (let i = 0; i < n; i++) {
+      const inBand = i < n * 0.4, m = rnd();
+      const x0 = rnd() * w, y0 = ((inBand ? band(x0) + (rnd() + rnd() + rnd() - 1.5) * h * 0.08 : rnd() * h) % h + h) % h;
+      const r = inBand ? 0.3 + m * 0.35 : m < 0.85 ? 0.35 + m * 0.4 : 0.8 + (m - 0.85) * 5;
+      const a = inBand ? 0.2 + rnd() * 0.35 : 0.25 + rnd() * 0.65, hue = rnd();
+      const col = hue < 0.1 ? '255,226,204' : hue < 0.3 ? '204,220,255' : '242,245,255';
+      pts.push({ x: x0, y: y0, r, a, col });
+      wrap(x0, y0, r * 5, (x, y) => {
+        g.fillStyle = `rgba(${col},${a.toFixed(2)})`;
+        g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+        if (r > 1.2 && a > 0.62) {
+          if (x === x0 && y === y0) bright.push({ x: x0, y, r, col, p: (i * 2.39996) % TAU, w: 0.35 + (i * 0.618034 % 1) * 0.9 });
+          g.strokeStyle = `rgba(${col},${(a * 0.35).toFixed(2)})`; g.lineWidth = 0.6;
+          g.beginPath(); g.moveTo(x - r * 4.5, y); g.lineTo(x + r * 4.5, y); g.moveTo(x, y - r * 4.5); g.lineTo(x, y + r * 4.5); g.stroke();
+        }
+      });
+    }
+    c.bright = bright; c.pts = pts;
+    return c;
+  }
+  const ACCENT = '#ffaadc';   // orchid: the front page's one accent (design.css --accent)
+  const rgbaOf = (hex, a) => `rgba(${rgb(hex).join(',')},${a})`;
+
   function buildStyle(vendor, tiles) {
     const pm = 'pmtiles://' + tiles;
     return {
@@ -1307,6 +1422,7 @@ const GlobeMap = (() => {
         protomaps: { type: 'vector', url: pm, maxzoom: TILE_MAXZOOM },
         cover: { type: 'vector', url: pm, maxzoom: 7 },
         majorWater: { type: 'geojson', data: vendor + 'map/major-lakes.json' },
+        graticule: { type: 'geojson', data: GRATICULE },
         routes: { type: 'geojson', data: EMPTY, tolerance: 0.5, buffer: 16 },
         routeSel: { type: 'geojson', data: EMPTY },
         originGuard: { type: 'geojson', data: EMPTY },
@@ -1322,7 +1438,12 @@ const GlobeMap = (() => {
           id: 'cover-' + kind, type: 'fill', source: 'cover', 'source-layer': 'landcover',
           filter: ['==', ['get', 'kind'], kind], paint: { 'fill-antialias': false, 'fill-color': landC(COVER[kind]) },
         })),
+        // The intro's engraving (setLook): hatched land, silver coasts and a graticule, all invisible on the map look.
+        { id: 'land-hatch', type: 'fill', source: 'protomaps', 'source-layer': 'earth', paint: { 'fill-pattern': 'hatch', 'fill-opacity': 0 } },
         { id: 'major-water', type: 'fill', source: 'majorWater', paint: { 'fill-color': waterC } },
+        { id: 'coast', type: 'line', source: 'protomaps', 'source-layer': 'earth', layout: { 'line-join': 'round' },
+          paint: { 'line-color': '#e6ebf3', 'line-opacity': 0, 'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.7, 6, 1.2] } },
+        { id: 'graticule', type: 'line', source: 'graticule', paint: { 'line-color': '#dfe6f1', 'line-opacity': 0, 'line-width': 0.7 } },
         { id: 'region-borders', type: 'line', source: 'protomaps', 'source-layer': 'boundaries', minzoom: 3.5,
           filter: ['==', ['get', 'kind'], 'region'], layout: { 'line-join': 'round' },
           paint: { 'line-color': LINES.region, 'line-opacity': ['interpolate', ['linear'], ['zoom'], 3.5, 0, 5, 0.8],
@@ -1337,7 +1458,7 @@ const GlobeMap = (() => {
         { id: 'routes-halo', type: 'line', source: 'routes', filter: ['all', ['==', ['get', 'h'], 1], ['!=', ['get', 'p'], 1]], layout: { 'line-cap': 'round', 'line-join': 'round' },
           paint: { 'line-color': HALO, 'line-opacity': 0.5, 'line-width': ['+', ['get', 'w'], 2] } },
         { id: 'routes', type: 'line', source: 'routes', filter: ['!=', ['get', 'p'], 1], layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: { 'line-color': ['get', 'c'], 'line-opacity': ['get', 'a'], 'line-width': ['get', 'w'] } },
+          paint: { 'line-color': ['get', 'c'], 'line-opacity': ['*', ['get', 'a'], 0.6], 'line-width': ['get', 'w'] } },
         { id: 'routes-dot-halo', type: 'line', source: 'routes', filter: dottedFilter([]), layout: { 'line-cap': 'round' },
           paint: { 'line-color': HALO, 'line-opacity': 0.3, 'line-width': 3.5 } },
         { id: 'routes-dot', type: 'line', source: 'routes', filter: dottedFilter([]), layout: { 'line-cap': 'round' },
@@ -1384,6 +1505,25 @@ const GlobeMap = (() => {
   }
   const lineFeature = (r, props) => ({ type: 'Feature', properties: props, geometry: { type: 'LineString', coordinates: r._line || (r._line = greatCircle(r.a, r.b)) } });
 
+  // pmtiles keeps a failed read in its cache for good: one dropped request while zoomed in (each
+  // directory covers a large part of the world) blanked that land until a reload. This cache drops
+  // a failure, so the retry below reads it again.
+  function forgetfulCache() {
+    class Forgetful extends pmtiles.SharedPromiseCache {
+      async getHeader(source) {
+        try { return await super.getHeader(source); } catch (e) { this.cache.delete(source.getKey()); throw e; }
+      }
+      async getDirectory(source, offset, length, header, signal) {
+        try { return await super.getDirectory(source, offset, length, header, signal); } catch (e) {
+          const key = `${source.getKey()}|${header.etag || ''}|${offset}|${length}`;
+          this.cache.delete(key); this.pendingFetches.delete(key);
+          throw e;
+        }
+      }
+    }
+    return new Forgetful();
+  }
+
   // ---------- the map ----------
   function create(el, opts = {}) {
     if (typeof maplibregl === 'undefined' || typeof pmtiles === 'undefined' || !document.createElement('canvas').getContext) return null;
@@ -1394,8 +1534,12 @@ const GlobeMap = (() => {
     el.classList.add('gmap');
     const box = document.createElement('div'); box.className = 'gmap-gl';
     box.setAttribute('aria-hidden', 'true');
-    el.append(box);
-    if (!maplibregl.__wtpPm) { maplibregl.addProtocol('pmtiles', new pmtiles.Protocol().tile); maplibregl.__wtpPm = true; }
+    // The sky (stars, and on the intro the nebula, glow and heading ring) sits under the map's
+    // canvas, which is clear outside the globe.
+    const sky = document.createElement('canvas'); sky.className = 'gmap-sky';
+    el.append(sky, box);
+    if (!maplibregl.__wtpPm) { maplibregl.__wtpPm = new pmtiles.Protocol(); maplibregl.addProtocol('pmtiles', maplibregl.__wtpPm.tile); }
+    if (!maplibregl.__wtpPm.get(tiles)) maplibregl.__wtpPm.add(new pmtiles.PMTiles(tiles, forgetfulCache()));
     let map;
     try {
       map = new maplibregl.Map({
@@ -1407,15 +1551,17 @@ const GlobeMap = (() => {
       box.remove();
       return null;   // no WebGL: the page says so and the list still works
     }
+    map.on('styleimagemissing', e => { if (e.id === 'hatch' && !map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 }); });
     map.touchZoomRotate.disableRotation();
     map.getCanvas().tabIndex = -1;   // #map takes the focus; its keys are below
     el.dataset.renderer = 'webgl';
     const top = map.getCanvasContainer();
     const over = document.createElement('canvas'); over.className = 'gmap-over';
+    const fx = document.createElement('canvas'); fx.className = 'gmap-fx';   // comets and rings (Night cabin)
     const pillsEl = document.createElement('div'); pillsEl.className = 'gmap-pills';
     const tipEl = document.createElement('div'); tipEl.className = 'map-tip'; tipEl.hidden = true;
-    top.append(over, pillsEl, tipEl);
-    const octx = over.getContext('2d');
+    top.append(fx, over, pillsEl, tipEl);
+    const octx = over.getContext('2d'), sctx = sky.getContext('2d'), fctx = fx.getContext('2d');
     let W = 0, H = 0, dpr = 1, ready = false;
     let scene = { routes: [], dots: [], origins: [], pills: [] };
     let hot = null, hits = [], drawn = null;
@@ -1513,12 +1659,28 @@ const GlobeMap = (() => {
       }
       const list = placeDots(P, originXY, moving);
       if (!moving) syncDotted();
-      // Dots, best on top; hit targets kept for hover and click.
+      // Dots, best on top; hit targets kept for hover and click. During a reveal (revealDots) each
+      // lights up like a star, nearest the given place first, with a brief four-point glint.
       hits = [];
+      const now = performance.now();
+      if (reveal && now > reveal.end) reveal = null;
       for (const [d, xy] of list) {
-        octx.beginPath(); octx.arc(xy[0], xy[1], d.r, 0, TAU);
+        let k = 1;
+        if (reveal) {
+          k = clamp((now - reveal.t0 - angle(reveal.c, d.p) / Math.PI * reveal.spread) / 280, 0, 1);
+          if (k <= 0) continue;
+        }
+        const r = d.r * (0.4 + 0.6 * (1 - (1 - k) ** 3));
+        octx.globalAlpha = k;
+        octx.beginPath(); octx.arc(xy[0], xy[1], r, 0, TAU);
         octx.fillStyle = d.fill; octx.fill();
         octx.lineWidth = d.sw ?? 1.5; octx.strokeStyle = d.stroke || HALO; octx.stroke();
+        if (k < 1) {
+          const fl = Math.sin(k * Math.PI), L = 4 + 8 * fl;
+          octx.globalAlpha = 0.7 * fl; octx.lineWidth = 1; octx.strokeStyle = '#eef4ff';
+          octx.beginPath(); octx.moveTo(xy[0] - L, xy[1]); octx.lineTo(xy[0] + L, xy[1]); octx.moveTo(xy[0], xy[1] - L); octx.lineTo(xy[0], xy[1] + L); octx.stroke();
+        }
+        octx.globalAlpha = 1;
         hits.push({ x: xy[0], y: xy[1], r: d.r, fr: footprint(d), d });
       }
       // Origins: a white disc with a grey dot and the code beside it (the shadowed disc is a sprite).
@@ -1542,6 +1704,17 @@ const GlobeMap = (() => {
         }
       }
       placePills(P);
+    }
+
+    // The home page's hand-over: the airports light up like stars, nearest [lat, lon] first, starting
+    // after delay ms and spread over spread ms by distance. Nothing with reduced motion.
+    let reveal = null;
+    function revealDots(lat, lon, { delay = 0, spread = 700 } = {}) {
+      if (reduce() || !W) { reveal = null; return; }
+      const t0 = performance.now() + delay;
+      reveal = { c: [lat, lon], t0, spread, end: t0 + spread + 300 };
+      const tick = () => { if (!reveal) return; map.triggerRepaint(); requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
     }
 
     let sprite = null;
@@ -1601,15 +1774,307 @@ const GlobeMap = (() => {
       }
     }
 
+    // ----- the sky: stars on every view; the intro adds a nebula, an orchid rim and a heading ring -----
+    // The stars drift a little as the globe turns (a quarter screen per full turn), wrapping round.
+    // introF: 1 on the intro, 0 elsewhere (twinkle, rim breathing). nightF: 1 on the night look, which
+    // keeps the intro's heading ring as a faint frame and a softer orchid rim.
+    let stars = null, look = ['intro', 'night'].includes(opts.look) ? opts.look : 'map', fadeRAF = 0;
+    let introF = look === 'intro' ? 1 : 0, nightF = look === 'night' ? 1 : 0, ringRot = 0;
+    const RING_NIGHT = 0.3, RIM_NIGHT = 0.4;
+    // The stars drift with the globe both ways: sideways with its longitude unwrapped (so crossing 180°
+    // never jumps the field), up and down with its latitude. Their motion blur follows the drift's
+    // smoothed velocity in px/s, in any direction.
+    let skyLng = null, prevLng = 0, lastOff = [0, 0], lastT = 0, skyV = [0, 0], settleT = 0;
+    // Night cabin: a rare shooting star with an orchid tail, one every 9-15 s, behind the globe. Not
+    // while the globe spins, in a hidden tab, or with reduced motion.
+    let meteor = null, meteorT = 0;
+    function queueMeteor() { clearTimeout(meteorT); meteorT = setTimeout(launchMeteor, 9000 + Math.random() * 6000); }
+    function launchMeteor() {
+      queueMeteor();
+      if (!W || reduce() || document.hidden || spinning()) return;
+      const a = (200 + Math.random() * 40) * RAD;   // falling down and to the left
+      meteor = { t0: performance.now(), x: W * (0.35 + Math.random() * 0.6), y: H * (0.05 + Math.random() * 0.35), ux: Math.cos(a), uy: -Math.sin(a), d: Math.min(W, H) * 0.35 };
+      const tick = () => { paintSky(); if (meteor) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }
+    // The home page's sky lives: the brightest stars glint now and then. Device px, drawn over the field.
+    function twinkle(dx, dy, sw, sh) {
+      const t = performance.now() / 1000, f = introF;
+      sctx.setTransform(1, 0, 0, 1, 0, 0);
+      sctx.lineWidth = dpr * 0.8;
+      for (const b of stars.bright) {
+        const k = Math.max(0, Math.sin(t * b.w + b.p)) ** 6 * f;
+        if (k < 0.04) continue;
+        const x = ((b.x * dpr + dx) % sw + sw) % sw, y = ((b.y * dpr + dy) % sh + sh) % sh, L = b.r * dpr * (5 + 7 * k);
+        sctx.strokeStyle = `rgba(${b.col},${(0.75 * k).toFixed(2)})`;
+        sctx.beginPath(); sctx.moveTo(x - L, y); sctx.lineTo(x + L, y); sctx.moveTo(x, y - L); sctx.lineTo(x, y + L); sctx.stroke();
+        sctx.fillStyle = `rgba(255,255,255,${(0.9 * k).toFixed(2)})`;
+        sctx.beginPath(); sctx.arc(x, y, b.r * dpr * (0.8 + 0.6 * k), 0, TAU); sctx.fill();
+      }
+    }
+    // While the home page is up the sky repaints at ~30 fps for the twinkle, the turning ring and the
+    // breathing rim. Off in a hidden tab, with reduced motion, and once it has handed over.
+    let ambRAF = 0, ambLast = 0;
+    function ambient(now) {
+      ambRAF = 0;
+      if (look !== 'intro' || reduce() || document.hidden || !W) return;
+      if (now - ambLast > 30 && !spinning()) { ambLast = now; paintSky(); }
+      ambRAF = requestAnimationFrame(ambient);
+    }
+    const startAmbient = () => { if (!ambRAF) ambRAF = requestAnimationFrame(ambient); };
+    document.addEventListener('visibilitychange', startAmbient);
+    function paintMeteor() {
+      if (!meteor) return;
+      const t = (performance.now() - meteor.t0) / 900;
+      if (t >= 1) { meteor = null; return; }
+      const e = 1 - (1 - t) ** 2, fade = t < 0.15 ? t / 0.15 : t > 0.7 ? (1 - t) / 0.3 : 1;
+      const hx = meteor.x + meteor.ux * meteor.d * e, hy = meteor.y + meteor.uy * meteor.d * e, len = 110 * fade;
+      const tx = hx - meteor.ux * len, ty = hy - meteor.uy * len;
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const gr = sctx.createLinearGradient(hx, hy, tx, ty);
+      gr.addColorStop(0, `rgba(255,255,255,${0.9 * fade})`); gr.addColorStop(0.25, rgbaOf(ACCENT, 0.55 * fade)); gr.addColorStop(1, rgbaOf(ACCENT, 0));
+      sctx.strokeStyle = gr; sctx.lineWidth = 1.4; sctx.lineCap = 'round';
+      sctx.beginPath(); sctx.moveTo(hx, hy); sctx.lineTo(tx, ty); sctx.stroke();
+      sctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    queueMeteor();
+    // The streaks: the field faintly where it is now (its glow and each star's head), then one line per
+    // star back along the drift (vx, vy device px), dimmer as it lengthens.
+    function streaks(dx, dy, sw, sh, vx, vy, L) {
+      sctx.globalAlpha = 0.35;
+      for (const ox of [dx - sw, dx]) for (const oy of [dy - sh, dy]) sctx.drawImage(stars, Math.round(ox), Math.round(oy));
+      sctx.globalAlpha = 1; sctx.lineCap = 'round';
+      for (const p of stars.pts) {
+        const x = (p.x * dpr + dx) % sw, y = (p.y * dpr + dy) % sh, w = Math.max(0.8 * dpr, 2 * p.r * dpr);
+        sctx.strokeStyle = `rgba(${p.col},${(p.a * Math.max(0.3, Math.min(1, 2.5 * w / L))).toFixed(2)})`;
+        sctx.lineWidth = w;
+        sctx.beginPath(); sctx.moveTo(x, y); sctx.lineTo(x - vx, y - vy); sctx.stroke();
+      }
+    }
+    function screenGlobe() {
+      const c = map.getCenter(), q = map.project([c.lng, c.lat]), r = globeRadius(), f = H / (2 * FOV_TAN);
+      return { x: q.x, y: q.y, rs: f * r / Math.sqrt(f * f + 2 * r * f) };
+    }
+    function paintSky() {
+      if (!W) return;
+      const key = `${W}x${H}@${dpr}`;
+      if (!stars || stars.key !== key) { stars = starField(W, H, dpr); stars.key = key; }
+      sctx.setTransform(1, 0, 0, 1, 0, 0);
+      sctx.clearRect(0, 0, sky.width, sky.height);
+      const sw = sky.width, sh = sky.height, c = map.getCenter(), now = performance.now();
+      if (skyLng == null) skyLng = c.lng;
+      else { const d = c.lng - prevLng; skyLng += d - 360 * Math.round(d / 360); }
+      prevLng = c.lng;
+      const perDeg = 0.25 * sw / 360;   // device px of drift per degree, the same both ways
+      const offX = -skyLng * perDeg, offY = c.lat * perDeg;
+      const dx = (offX % sw + sw) % sw, dy = (offY % sh + sh) % sh, dt = now - lastT;
+      // Velocity, smoothed over ~80 ms so the streaks ease in and out instead of flickering. Repeat
+      // paints within one frame keep the last value; a long pause reads as stopped.
+      if (dt >= 4) {
+        const k = Math.min(1, dt / 80), ix = dt > 250 ? 0 : (offX - lastOff[0]) / dt * 1000, iy = dt > 250 ? 0 : (offY - lastOff[1]) / dt * 1000;
+        skyV = [skyV[0] + (ix - skyV[0]) * k, skyV[1] + (iy - skyV[1]) * k];
+        if (Math.hypot(skyV[0], skyV[1]) < 1) skyV = [0, 0];
+        lastOff = [offX, offY]; lastT = now;
+      }
+      // Motion blur: each star draws as a line back along its drift, as long as a 1/25 s shutter
+      // would catch: level lines when the globe spins, slanted or upright when it moves any other way.
+      const sp = Math.hypot(skyV[0], skyV[1]), L = reduce() ? 0 : Math.min(sp / 25, 70 * dpr);
+      if (L > 2 * dpr) streaks(dx, dy, sw, sh, skyV[0] / sp * L, skyV[1] / sp * L, L);
+      else for (const ox of [dx - sw, dx]) for (const oy of [dy - sh, dy]) sctx.drawImage(stars, Math.round(ox), Math.round(oy));
+      if (introF > 0 && !reduce()) twinkle(dx, dy, sw, sh);
+      // When the globe stops, no frame comes to clear the streaks: settle them shortly after.
+      if (sp && !settleT) settleT = setTimeout(() => { settleT = 0; paintSky(); }, 120);
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const g = screenGlobe(), f = introF, { x, y, rs } = g;
+      const glow = (cx, cy, r, col, a) => {
+        const gr = sctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        gr.addColorStop(0, col.replace('A', a)); gr.addColorStop(1, col.replace('A', 0));
+        sctx.fillStyle = gr; sctx.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+      };
+      // The nebula tints the sky on every view, so search sits in the home page's sky: orchid up and
+      // to the left of the globe, a cool blue down and to the right. Sized to the whole-globe view,
+      // so it stays put as you zoom in.
+      const rn = Math.max(rs, 0.44 * Math.min(W, H)), nx = Math.min(x, W * 0.75), ny = Math.min(Math.max(y, H * 0.3), H * 0.7);
+      glow(nx - rn * 0.75, ny - rn * 0.55, rn * 1.9, rgbaOf(ACCENT, 'A'), 0.17);
+      glow(nx + rn * 0.85, ny + rn * 0.65, rn * 1.5, 'rgba(125,217,252,A)', 0.07);
+      sctx.setTransform(1, 0, 0, 1, 0, 0);
+      paintMeteor();
+      if (introF <= 0 && nightF <= 0) return;
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // The rim: dusk light just outside the globe's edge. It breathes only on the home page (elsewhere
+      // the sky paints with the map's frames, so a clock here would flicker).
+      const rim = sctx.createRadialGradient(x, y, rs * 0.97, x, y, rs * 1.2);
+      const tA = reduce() ? 0 : performance.now() / 1000, breathe = look === 'intro' ? 0.86 + 0.14 * Math.sin(tA * TAU / 6) : 1;
+      const rimA = Math.max(f, RIM_NIGHT * nightF) * breathe;
+      rim.addColorStop(0, rgbaOf(ACCENT, 0.42 * rimA)); rim.addColorStop(0.35, rgbaOf(ACCENT, 0.12 * rimA)); rim.addColorStop(1, rgbaOf(ACCENT, 0));
+      sctx.fillStyle = rim; sctx.beginPath(); sctx.arc(x, y, rs * 1.2, 0, TAU); sctx.fill();
+      // The heading ring, labelled like a heading indicator, while the whole globe is on screen. It turns
+      // slowly on the home page (a full turn in 4 min) and holds still after. Handing over to the night
+      // look it dims to a faint frame; to the map look it widens as it fades.
+      if (look === 'intro' && !reduce()) ringRot = tA * 1.5 * RAD;
+      const ringA = Math.max(f, RING_NIGHT * nightF), rot = ringRot;
+      const RR = (rs * 1.16 + 6) * (1 + 0.22 * (1 - Math.max(f, nightF)) ** 0.7);
+      if (RR > 0.75 * Math.max(W, H) || ringA < 0.01) return;
+      sctx.strokeStyle = `rgba(222,229,240,${0.3 * ringA})`; sctx.lineWidth = 1;
+      sctx.beginPath(); sctx.arc(x, y, RR, 0, TAU); sctx.stroke();
+      sctx.beginPath();
+      for (let d = 0; d < 360; d += 5) {
+        const a = d * RAD + rot, s = Math.sin(a), c = -Math.cos(a), len = d % 30 === 0 ? 9 : d % 10 === 0 ? 5 : 3;
+        sctx.moveTo(x + s * RR, y + c * RR); sctx.lineTo(x + s * (RR + len), y + c * (RR + len));
+      }
+      sctx.stroke();
+      sctx.font = '500 11px "Plus Jakarta Sans", system-ui, sans-serif';
+      sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+      for (let d = 0; d < 360; d += 30) {
+        const a = d * RAD + rot, lab = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' }[d] || String(d / 10).padStart(2, '0');
+        sctx.fillStyle = `rgba(232,237,245,${(d % 90 === 0 ? 0.85 : 0.6) * ringA})`;
+        sctx.fillText(lab, x + Math.sin(a) * (RR + 21), y - Math.cos(a) * (RR + 21));
+      }
+    }
+    // The map look or the intro's engraved one, crossfaded over 0.9 s by default (at once with reduced motion
+    // or before the first frame).
+    function setLook(next, dur = 900) {
+      if (!['intro', 'night', 'map'].includes(next)) next = 'map';
+      if (next === look) return;
+      look = next;
+      if (next !== 'intro') startFx();
+      const ms = !ready || reduce() ? 0 : dur;
+      if (ready) applyLook(ms);
+      cancelAnimationFrame(fadeRAF);
+      const from = [introF, nightF], to = [next === 'intro' ? 1 : 0, next === 'night' ? 1 : 0], t0 = performance.now();
+      const step = now => {
+        const t = ms ? Math.min(1, (now - t0) / ms) : 1, e = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+        introF = from[0] + (to[0] - from[0]) * e;
+        nightF = from[1] + (to[1] - from[1]) * e;
+        paintSky();
+        if (t < 1) fadeRAF = requestAnimationFrame(step);
+      };
+      step(t0);
+    }
+    function applyLook(ms) {
+      const i = look === 'intro' ? 3 : look === 'night' ? 4 : 2;
+      for (const row of LOOK) {
+        map.setPaintProperty(row[0], row[1] + '-transition', { duration: ms, delay: 0 });
+        map.setPaintProperty(row[0], row[1], row[i]);
+      }
+    }
+
+    // ----- the opening spin: half a turn, west to east like the Earth, ending over the visitor -----
+    // Any touch, wheel, key or camera move of ours stops it where it is.
+    let spinRAF = 0, spinId = 0, labelsHidden = false;
+    // Country names hide while it turns (placed labels trail a fast spin) and fade in when it lands.
+    function spinLabels(on) {
+      if (!ready || on === !labelsHidden) return;
+      labelsHidden = !on;
+      map.setPaintProperty('country-labels', 'text-opacity-transition', { duration: on ? 600 : 0, delay: 0 });
+      map.setPaintProperty('country-labels', 'text-opacity', on ? 1 : 0);
+    }
+    function stopSpin() { spinId++; cancelAnimationFrame(spinRAF); spinRAF = 0; spinLabels(true); startAmbient(); }
+    const spinning = () => spinRAF !== 0;
+    function spinTo(lat, lon, { duration = 3200, onDone, onStart, grow = 0.78 } = {}) {
+      stopSpin();
+      const id = spinId, lat1 = clamp(lat, -40, 50), lat0 = map.getCenter().lat;
+      const rs = W ? Math.max(1, screenGlobe().rs) : rWorld();   // keep the globe's size on screen
+      const at = (lo, la) => map.jumpTo({ center: [wrapPi(lo * RAD) * DEG, la], zoom: zoomForScreen(rs, la) });
+      if (reduce()) { at(lon, lat1); onStart?.(); onDone?.(); return; }
+      // Arriving from deep space: it starts smaller (grow) and comes up to size as it turns.
+      const atG = (lo, la, e) => map.jumpTo({ center: [wrapPi(lo * RAD) * DEG, la], zoom: zoomForScreen(rs * (grow + (1 - grow) * (1 - (1 - e) ** 2)), la) });
+      atG(lon + 180, lat0, 0);
+      let started = false;
+      const run = () => {
+        if (started || id !== spinId) return;   // stopped before it began, or already running
+        started = true;
+        spinLabels(false);
+        onStart?.();
+        const t0 = performance.now();
+        const step = now => {
+          if (id !== spinId) return;
+          const t = Math.min(1, (now - t0) / duration), e = 1 - (1 - t) ** 4;
+          atG(lon + 180 * (1 - e), lat0 + (lat1 - lat0) * e, t);
+          spinRAF = t < 1 ? requestAnimationFrame(step) : 0;
+          if (t >= 1) { spinLabels(true); paintSky(); startAmbient(); onDone?.(); }
+        };
+        spinRAF = requestAnimationFrame(step);
+      };
+      // It starts once the globe's first tiles are in (or after 1.5 s), so it never spins empty.
+      const begin = () => { map.once('idle', run); setTimeout(run, 1500); };
+      if (ready) begin(); else map.once('load', begin);
+    }
+    // (A wheel only counts while it can zoom: the home page locks zoom, and a stray scroll there leaves the spin be.)
+    for (const ev of ['pointerdown', 'wheel', 'keydown', 'touchstart']) el.addEventListener(ev, e => { if (e.type !== 'wheel' || map.scrollZoom.isEnabled()) stopSpin(); }, { passive: true });
+    // The home page hands over: one eased move to the page's new free area, at the whole-globe size.
+    // A place ([lat, lon]) turns it there on the way (the home page skipped before its spin landed).
+    function arrive(ms = 1100, place = null) {
+      stopSpin();
+      if (!W) return;
+      const s = safe(), p = { left: s.x0, top: s.y0, right: W - s.x1, bottom: H - s.y1 };
+      const lat = clamp(place ? place[0] : map.getCenter().lat, -45, 50), lng = place ? place[1] : map.getCenter().lng;
+      const to = { center: [lng, lat], zoom: zoomForScreen(rWorld(), lat), padding: p };
+      map.setMinZoom(Math.max(0, zoomForScreen(0.6 * rWorld(), 0)));
+      if (!ms || reduce()) map.jumpTo(to);
+      // Ease in and out: it often starts from a globe at rest (or a spin just stopped), so no lurch.
+      else map.easeTo({ ...to, duration: ms, easing: t => t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2, essential: true });
+    }
+
     // ----- frame loop: the overlay paints in the map's own frame, so the two never drift -----
+    map.on('render', paintSky);
     map.on('render', paintOver);
-    const redraw = () => { picked = null; if (W) { paintOver(); map.triggerRepaint(); } };
+    const redraw = () => { picked = null; if (W) { paintSky(); paintOver(); map.triggerRepaint(); startFx(); } };
+
+    // ----- Night cabin motion: a glacier comet travels each route on a 3 s loop, and destinations send
+    // out a soft orchid ring every 2.4 s, staggered so no two pulse together. Its own canvas and frame
+    // loop (the map paints only while it moves); it stops with nothing to animate, in a hidden tab,
+    // with reduced motion, and on the home page.
+    const GLACIER = '#7dd9fc', MAX_COMETS = 24, MAX_RINGS = 16;
+    let fxRAF = 0;
+    function paintFx(now) {
+      fxRAF = 0;
+      fctx.setTransform(1, 0, 0, 1, 0, 0);
+      fctx.clearRect(0, 0, fx.width, fx.height);
+      if (!W || reduce() || document.hidden || look === 'intro') return;
+      const shownDots = dottedKey ? new Set(dottedKey.split(',')) : new Set();
+      const routes = scene.routes.filter(r => !r.potential || shownDots.has(r.code)).slice(0, MAX_COMETS);
+      const rings = pillNodes.filter(n => n.on).slice(0, MAX_RINGS).map(n => n.p.p);
+      if (!routes.length && !rings.length) return;
+      fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const P = projector();
+      routes.forEach((r, i) => {
+        const line = r._line || (r._line = greatCircle(r.a, r.b)), n = line.length - 1;
+        if (n < 1) return;
+        const head = (((now / 3000) + i * 0.37) % 1) * n, tail = Math.max(1.5, n * 0.18);
+        let prev = null;
+        for (let k = 0; k <= 10; k++) {
+          const u = head - tail * k / 10;
+          if (u < 0) break;
+          const j = Math.floor(u), f = u - j, a = line[j], b = line[Math.min(n, j + 1)];
+          const xy = P(a[1] + (b[1] - a[1]) * f, a[0] + (b[0] - a[0]) * f);   // line points are [lon, lat]
+          if (xy && prev) {
+            fctx.strokeStyle = rgbaOf(GLACIER, (0.85 * (1 - k / 10)).toFixed(3)); fctx.lineWidth = 2.2 * (1 - k / 12);
+            fctx.beginPath(); fctx.moveTo(prev[0], prev[1]); fctx.lineTo(xy[0], xy[1]); fctx.stroke();
+          }
+          if (k === 0 && xy) { fctx.fillStyle = '#ffffff'; fctx.beginPath(); fctx.arc(xy[0], xy[1], 1.8, 0, TAU); fctx.fill(); }
+          prev = xy;
+        }
+      });
+      rings.forEach((p, i) => {
+        const u = ((now / 2400) + i / rings.length) % 1;
+        if (u > 0.6) return;   // each ring lives 1.4 s of every 2.4 s
+        const xy = P(p[0], p[1]);
+        if (!xy) return;
+        const v = u / 0.6;
+        fctx.strokeStyle = rgbaOf(ACCENT, (0.55 * (1 - v)).toFixed(3)); fctx.lineWidth = 1.5;
+        fctx.beginPath(); fctx.arc(xy[0], xy[1], 6 + 12 * v, 0, TAU); fctx.stroke();
+      });
+      fxRAF = requestAnimationFrame(paintFx);
+    }
+    function startFx() { if (!fxRAF) fxRAF = requestAnimationFrame(paintFx); }
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) startFx(); });
     // moveend can fire while a gesture still counts as moving, so the settled repaint waits a tick.
     let layoutDue = false;
     map.on('moveend', () => setTimeout(() => {
       picked = null;
       if (layoutDue) layout();
-      if (!map.isMoving()) paintOver();
+      if (!map.isMoving()) { paintOver(); startFx(); }
     }, 0));
 
     // ----- routes -----
@@ -1629,6 +2094,7 @@ const GlobeMap = (() => {
 
     // ----- camera -----
     function moveTo(target, animate = true) {
+      stopSpin();
       const to = { center: [target.lon, target.lat], zoom: target.zoom };
       if (!animate || reduce()) map.jumpTo(to);
       else map.easeTo({ ...to, duration: target.duration || 800, essential: true });
@@ -1675,6 +2141,7 @@ const GlobeMap = (() => {
     }
     // Buttons and keys: around the middle of the part of the map the panels leave free.
     function zoomBy(f) {
+      stopSpin();
       syncPadding();
       map.easeTo({ zoom: map.getZoom() + Math.log2(f), duration: reduce() ? 0 : 200 });
     }
@@ -1686,7 +2153,10 @@ const GlobeMap = (() => {
       if (map.isMoving()) { layoutDue = true; return; }
       layoutDue = false;
       const s = safe(), p = { left: s.x0, top: s.y0, right: W - s.x1, bottom: H - s.y1 }, q = map.getPadding();
-      if (p.left !== q.left || p.top !== q.top || p.right !== q.right || p.bottom !== q.bottom) map.easeTo({ padding: p, duration: reduce() ? 0 : 250 });
+      if (p.left === q.left && p.top === q.top && p.right === q.right && p.bottom === q.bottom) return;
+      // Mid-spin the spin's next frame would cut an eased move short: set the padding at once.
+      if (spinning()) map.setPadding(p);
+      else map.easeTo({ padding: p, duration: reduce() ? 0 : 250 });
     }
 
     // Keyboard: arrows move, + and - zoom (the map is focusable; the zoom buttons do the same).
@@ -1746,8 +2216,7 @@ const GlobeMap = (() => {
       if (!w || !h || (w === W && h === H && d === dpr)) return;
       const first = !W;
       W = w; H = h; dpr = d;
-      over.width = Math.round(W * dpr); over.height = Math.round(H * dpr);
-      over.style.width = W + 'px'; over.style.height = H + 'px';
+      for (const c of [over, sky, fx]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); c.style.width = W + 'px'; c.style.height = H + 'px'; }
       map.resize();
       syncPadding();
       map.setMinZoom(Math.max(0, zoomForScreen(0.6 * rWorld(), 0)));
@@ -1757,14 +2226,33 @@ const GlobeMap = (() => {
     new ResizeObserver(() => { resize(); if (lastFit && !lastFit.fitted && W) { lastFit.fitted = true; refit(false); } }).observe(el);
     resize();
 
-    map.on('load', () => { ready = true; syncRoutes(); syncHot(); redraw(); });
-    // One tile failing (a fast jump can cancel its request) isn't fatal: fetch it again. A tile
-    // file that can't be read at all is, and the page says so.
-    let tileErrors = 0, retryT = 0, failed = false;
+    map.on('load', () => { ready = true; applyLook(0); syncRoutes(); syncHot(); redraw(); });
+    // A tile that fails (a dropped or cancelled request) is fetched again, for as long as the page is
+    // open: after 0.6 s, then backing off to 15 s, and back to 0.6 s once a tile loads. The page says
+    // the tiles couldn't load only while none has loaded yet.
+    let retryT = 0, backoff = 600, startErrors = 0, landOk = false, failed = false;
+    const retryIds = new Map();   // source -> canonical tile ids that errored
+    map.on('data', e => {
+      if (e.dataType !== 'source' || !e.tile || (e.sourceId !== 'protomaps' && e.sourceId !== 'cover')) return;
+      landOk = true; backoff = 600;
+    });
     map.on('error', e => {
-      if (!e.tile || ++tileErrors > 8) { if (!failed) { failed = true; opts.onLandError?.(); } return; }
-      clearTimeout(retryT);
-      retryT = setTimeout(() => { for (const id of ['protomaps', 'cover']) { try { map.refreshTiles(id); } catch { /* still loading */ } } }, 600);
+      if (!landOk && ++startErrors > 8 && !failed) { failed = true; opts.onLandError?.(); }
+      const id = e.sourceId, c = e.tile?.tileID?.canonical;
+      if (id && c) {
+        if (!retryIds.has(id)) retryIds.set(id, new Map());
+        retryIds.get(id).set(`${c.z}/${c.x}/${c.y}`, { z: c.z, x: c.x, y: c.y });
+      }
+      if (retryT) return;
+      retryT = setTimeout(() => {
+        retryT = 0;
+        const todo = [...retryIds];
+        retryIds.clear();
+        // An error with no tile (the file's header) retries everything.
+        if (!todo.length) todo.push(['protomaps', null], ['cover', null]);
+        for (const [sid, ids] of todo) { try { map.refreshTiles(sid, ids ? [...ids.values()] : undefined); } catch { /* not loaded yet */ } }
+      }, backoff);
+      backoff = Math.min(15000, backoff * 1.5);
     });
 
     return {
@@ -1783,6 +2271,7 @@ const GlobeMap = (() => {
         redraw();
       },
       fit, refit, zoomBy, layout,
+      setLook, spinTo, stopSpin, arrive, revealDots,
       resize,
       redraw,
       view: () => (map.getZoom() < 5 ? 'globe' : 'flat'),
@@ -1795,12 +2284,12 @@ const GlobeMap = (() => {
       map,
     };
   }
-  return { create, HALO, colourAt, LAND_VIBRANCE, WATER_VIBRANCE };
+  return { create, HALO, colourAt, LAND_VIBRANCE, WATER_VIBRANCE, NIGHT };
 })();
 </script>
 <script>
 'use strict';
-const D = {"generated":"2026-11-01 20:36","apiBase":"api/","dataBase":"data/","fares":164420,"routes":1300,"public":false};
+const D = {"generated":"2026-11-09 17:46","apiBase":"api/","dataBase":"data/","fares":164420,"routes":1300,"public":false};
 // The build injects {generated, apiBase, dataBase, fares, routes}. Paths resolve against the page,
 // so on http://ccx/atlas/ "api/" is /atlas/api/ and "data/" is /atlas/data/.
 const CFG = Object.assign({ generated: null, apiBase: 'api/', dataBase: 'data/', fares: 0, routes: 0, public: false }, D || {});
@@ -2537,23 +3026,128 @@ const LABEL_MAX = 60;   // pills considered per view; the cheapest win
 // Airports without a price: a bright cool white that stands out on the map zoomed out. No fare tiers
 // are on screen with them (the tiers only draw with results), so they can't read as the white tier.
 const DOT_IDLE = '#EAF3FF';
+
+// ---------- the home page (Direction C, "Grand tour") ----------
+// Opened with no search in the address, the page starts as the home page: the engraved globe (globe.js
+// setLook('intro')), stars and the hero, with the search UI hidden while it loads underneath. The
+// globe fades up and spins half a turn to the visitor while the hero comes in, then it stays (the sky
+// twinkles, the heading ring turns) until the visitor presses Start searching. Then it hands over: the
+// hero lifts away, the globe glides into the search layout and turns to the map look, and the search
+// bar drops in and the panels rise. Reduced motion: fades only, no spin or glide.
+const HOME = { on: document.documentElement.dataset.home === '1', left: false, ready: false, spun: false };
+// Where the visitor probably is, from the browser's time zone: no prompt and no request. The zone's
+// own city when an airport serves it (America/Indiana/Indianapolis is IND), else the UTC offset's
+// longitude at its region's rough latitude.
+function userPlace() {
+  let tz = '';
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* no Intl time zones */ }
+  const city = tz.split('/').pop().replace(/_/g, ' ').toLowerCase();
+  if (city.length > 2 && META) {
+    const code = Object.keys(AP).find(c => cityOf(c).toLowerCase() === city && ORIGINS.has(c)) || Object.keys(AP).find(c => cityOf(c).toLowerCase() === city);
+    if (code) return { lat: AP[code][0], lon: AP[code][1] };
+  }
+  const LAT = { America: 38, Europe: 48, Asia: 28, Africa: 5, Australia: -28, Pacific: -15, Atlantic: 30, Indian: -10 };
+  return { lat: LAT[tz.split('/')[0]] ?? 25, lon: Math.max(-180, Math.min(180, -new Date().getTimezoneOffset() / 4)) };
+}
+// The spin starts once the search page's data is in (so it lands where the visitor is), or after 2.5 s without it.
+function homeSpin() {
+  if (!HOME.on || HOME.left || HOME.spun) return;
+  HOME.spun = true;
+  const me = userPlace();
+  if (!gmap) { homeLive(); return; }
+  // design.css starts the hero when the globe starts to turn; then it waits for Start searching
+  gmap.spinTo(me.lat, me.lon, { onStart: homeLive, onDone: () => { HOME.landed = true; } });
+}
+// The home page's opening plays from here (design.css html[data-home-live]): the globe fades up as it
+// turns and the hero comes in. A fallback at 3.5 s so the hero never waits long on a slow load.
+function homeLive() { if (HOME.on) document.documentElement.dataset.homeLive = '1'; }
+if (HOME.on) setTimeout(homeLive, 3500);
+// On the home page the globe can be turned by hand but not zoomed (the layout stays put); the search
+// page gets every control back.
+function homeZoomLock(on) {
+  const m = gmap?.map;
+  if (!m) return;
+  for (const h of ['scrollZoom', 'doubleClickZoom', 'boxZoom', 'touchZoomRotate']) m[h][on ? 'disable' : 'enable']();
+  if (!on) m.touchZoomRotate.disableRotation();
+}
+// The search page's globe: the night look in dark mode (the map in the home page's navy), the map's
+// own colours in light mode.
+const darkQ = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => { const t = document.documentElement.dataset.theme; return t === 'dark' || (!t && darkQ.matches); };
+const searchLook = () => (isDark() ? 'night' : 'map');
+// Start searching grows into the search bar: the bar starts clipped to the button's box and moved
+// onto it, then opens out to its own place while its tint turns from the button's orchid to the
+// panel's. The numbers go to design.css's bar-grow as custom properties, so the move runs on the
+// same clock as the rest of the hand-over (its contents fade in as it lands).
+function growFromButton(btn, bar) {
+  if (!btn || !bar || !bar.getClientRects().length) return false;
+  const b = btn.getBoundingClientRect(), c = bar.getBoundingClientRect();
+  if (!c.width || !c.height) return false;
+  const tint = getComputedStyle(btn).backgroundColor, s = bar.style;
+  // The clip window is the button's size at the bar's top left; the move puts that window on the button.
+  s.setProperty('--gx', `${Math.round(b.left - c.left)}px`);
+  s.setProperty('--gy', `${Math.round(b.top - c.top)}px`);
+  s.setProperty('--gclip', `inset(0px ${Math.max(0, c.width - b.width)}px ${Math.max(0, c.height - b.height)}px 0px round 12px)`);
+  s.setProperty('--gr', getComputedStyle(bar).borderTopLeftRadius || '20px');
+  if (tint !== 'rgba(0, 0, 0, 0)') s.setProperty('--gtint', tint);
+  return true;
+}
+function leaveHome() {
+  if (!HOME.on || HOME.left) return;
+  HOME.left = true;
+  const root = document.documentElement, quick = reduceMotion.matches;
+  const bar = phoneMQ.matches ? $('top-pill') : $('console');
+  root.dataset.home = 'leaving';   // design.css: the hero lifts away, the search UI comes in (and the bar can be measured)
+  if (!quick && growFromButton($('home-go'), bar)) root.dataset.grow = '1';
+  homeLive();
+  trackTop();
+  const me = HOME.landed ? null : userPlace();   // left mid-spin: turn to the visitor on the way
+  const go = () => {
+    homeZoomLock(false);
+    // The globe glides over (1.4 s) while its look eases into the search page's, and the ring dims to a frame.
+    gmap?.arrive(quick ? 0 : 1400, me && [me.lat, me.lon]);  // mapInsets() now answers for the search layout
+    if (quick) gmap?.setLook(searchLook(), 0); else setTimeout(() => gmap?.setLook(searchLook(), 1200), 200);
+    const c = gmap?.map?.getCenter();
+    if (c && !quick) gmap.revealDots(c.lat, c.lng, { delay: 900, spread: 700 });   // airports light up like stars
+    drawMap();
+  };
+  // Reduced motion: no glide; the map dips to dark (design.css map-dip) and is re-framed while it is out.
+  if (quick) setTimeout(go, 330); else go();
+  const fromKeys = document.activeElement?.id === 'home-go';
+  setTimeout(() => {
+    delete root.dataset.home; delete root.dataset.homeLive; delete root.dataset.grow; HOME.on = false; trackTop(); gmap?.layout();
+    if (fromKeys && !phoneMQ.matches) $('from-input')?.focus({ preventScroll: true });   // keyboard users land in the search
+  }, quick ? 950 : 1700);
+}
+// Only Start searching leaves the home page (Seth): no timer, and no other click, key or scroll.
+$('home-go').onclick = leaveHome;
+// The first Tab on the home page goes to Start searching (the map and its credit link come earlier in the page).
+document.addEventListener('keydown', e => {
+  if (HOME.on && !HOME.left && e.key === 'Tab' && !e.shiftKey && document.activeElement !== $('home-go')) { e.preventDefault(); $('home-go').focus(); }
+});
 // The part of the map the floating panels leave free, so fits frame the results in the open.
 function mapInsets() {
   const H = innerHeight;
+  if (HOME.on && !HOME.left) {   // the home page: the globe sits right of the hero (below it on a phone)
+    if (phoneMQ.matches) return { top: Math.min(H * 0.42, $('home').querySelector('.home-hero').getBoundingClientRect().bottom + 24), left: 12, right: 12, bottom: 32 };
+    return { top: 48, left: Math.round(innerWidth * 0.36), right: 48, bottom: 48 };
+  }
   if (phoneMQ.matches) {
     // Always the closed sheet's height, so opening the sheet doesn't move the map under it, and
     // equal sides so the globe sits in the middle of the screen.
-    const leg = $('legend'), peek = $('sheet-head').offsetHeight + $('safe-bottom').offsetHeight;
-    return { top: 16, left: 12, right: 12, bottom: peek + (leg.hidden ? 12 : leg.offsetHeight + 20) };
+    const leg = $('legend'), peek = $('sheet-head').offsetHeight + $('safe-bottom').offsetHeight, pill = $('top-pill');
+    const top = pill.offsetHeight ? pill.getBoundingClientRect().bottom + 12 : 16;
+    return { top, left: 12, right: 12, bottom: peek + (leg.hidden ? 12 : leg.offsetHeight + 20) };
   }
   const deals = S.mode === 'deals', res = $('results');
-  const top = $('console').getBoundingClientRect().bottom + 12;
+  const top = $('console').offsetTop + $('console').offsetHeight + 12;   // layout: the bar may be mid-animation
   const panelOff = document.body.dataset.mapwide === '1' && !deals;
   const left = panelOff ? 16 : res.getBoundingClientRect().right + 16;
   return { top, left, right: 76, bottom: 96 };
 }
 function initMap() {
   gmap = typeof GlobeMap === 'object' ? GlobeMap.create($('map'), {
+    look: HOME.on ? 'intro' : searchLook(),   // the home page's engraved globe from the first frame
     insets: mapInsets,
     reduceMotion: () => reduceMotion.matches,
     tiles: CFG.site?.tilesUrl || CFG.tilesUrl || 'tiles/world.pmtiles',
@@ -2563,7 +3157,14 @@ function initMap() {
     $('map').insertAdjacentHTML('beforeend', `<div class="map-error" role="alert"><h2>The map couldn’t load</h2>
       <p>The map needs WebGL and its library. Check the connection and reload, or try another browser. The list works without it.</p>
       <p><button type="button" class="btn" data-act="reload">Reload the page</button></p></div>`);
-  } else watchPanels();
+  } else {
+    watchPanels();
+    // The home page opens on the far side of the world (a rough guess until the data names the city).
+    if (HOME.on) {
+      const me = userPlace(); gmap.map.jumpTo({ center: [((me.lon + 360) % 360) - 180, 20] });
+      homeZoomLock(true);
+    }
+  }
 }
 // Frame points ([lat, lon]). globe: a long selected route (>= 7,000 km) stays on the globe.
 function watchPanels() {
@@ -2604,6 +3205,7 @@ const pillHTML = (code, pts) => `<b>${code}</b> ${fmtK(pts)}`;
 const placeTip = (code, rest) => `<b>${esc(cityOf(code))} (${code})</b>${AP[code]?.[3] ? ` · ${esc(countryName(AP[code][3]))}` : ''}${rest ? '<br>' + rest : ''}`;
 function drawMap() {
   if (!gmap) return;
+  if (HOME.on && !HOME.left) { gmap.setScene({}); return; }   // the home page shows only the globe
   HOT = null;
   gmap.setHot(null);
   let sc = {};
@@ -2615,7 +3217,7 @@ function drawMap() {
 // Before a search: the airports with fares departing, busiest first, sized by how many fares leave
 // them (3-6 px on a log scale). globe.js draws only the top ones for the zoom (cap), so the world
 // view shows ~25 and more appear as you zoom in. A click searches every route from that airport.
-let idleFitted = false, IDLE = null;
+let idleFitted = HOME.on, IDLE = null;   // after the home page, leaveHome's arrive() frames the globe
 function idleAirports() {   // atlas/web/airports.js
   if (IDLE && IDLE.meta === META && IDLE.off === OFFLINE) return IDLE.list;
   const list = Airports.rank(ORIGINS, META.departing, c => !!AP[c]);
@@ -2780,6 +3382,11 @@ function renderPill() {
   else if (!S.from.length && !S.to.length) t = 'Search award flights';
   else t = `${placesText(S.from, 'Anywhere')} → ${placesText(S.to, 'Anywhere')} · ${S.month ? fmtMonth(S.month, false) : fmtSpan(S.d1, S.d2)} · ${CABIN[S.cabin]} · ${cardShort(S.card)}`;
   $('pill-text').textContent = t;
+  const two = S.mode === 'routes' ? [`Routes`, `${CABIN[S.cabin]} · ${cardShort(S.card)}`]
+    : !S.from.length && !S.to.length ? ['Search award flights', 'From any airport, priced in your card’s points']
+    : [`${placesText(S.from, 'Anywhere')} → ${placesText(S.to, 'Anywhere')}`, `${S.month ? fmtMonth(S.month, false) : fmtSpan(S.d1, S.d2)} · ${CABIN[S.cabin]} · ${cardShort(S.card)}`];
+  $('tp-1').textContent = two[0]; $('tp-2').textContent = two[1];
+  $('top-pill').setAttribute('aria-label', `${two.join('. ')}. Edit the search`);
   $('pill').setAttribute('aria-label', `${t}. ${$('search').classList.contains('open') ? 'Hide' : 'Edit'} the search`);
 }
 
@@ -3038,7 +3645,7 @@ function calendarHTML() {
     const isLow = low && d === low[0];
     const t = T.day(tab, d, v);
     used.add(t);
-    cells.push(`<button type="button" class="day ${tierCls(t)}${isLow ? ' lowest' : ''}" data-act="${tab === 'out' ? 'day' : 'rday'}" data-d="${d}" aria-pressed="${d === sel}" tabindex="${d === tabbable ? 0 : -1}"
+    cells.push(`<button type="button" class="day ${tierCls(t)}${isLow ? ' lowest' : ''}" data-act="${tab === 'out' ? 'day' : 'rday'}" data-d="${d}" aria-pressed="${d === sel}" tabindex="${d === tabbable ? 0 : -1}"${isLow ? ' title="Lowest price in your dates"' : ''}
       aria-label="${esc(fmtDay(d))}: from ${fmtN(v)} ${unit}, ${TIER[t].name.toLowerCase()}${isLow ? ', the lowest' : ''}"><span class="dn" aria-hidden="true">${dnum}</span><span class="dv" aria-hidden="true">${fmtK(v)}</span></button>`);
   }
   const dows = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(x => `<span class="dow" aria-hidden="true">${x.slice(0, 2)}</span>`).join('');
@@ -4001,6 +4608,11 @@ $$('[data-set-mode]').forEach(b => b.onclick = () => {
   setMode(b.dataset.setMode);
   if (phoneMQ.matches && !sheetOpen()) setSheet(true);   // on the phone a tab opens the sheet on it
 });
+$('top-pill').onclick = () => {
+  setSheet(true, { focus: false });
+  setFormOpen(true);
+  (S.from.length ? $('go') : $('from-input')).focus();
+};
 $('pill').onclick = () => {
   const open = !$('search').classList.contains('open');
   setFormOpen(open);
@@ -4009,9 +4621,11 @@ $('pill').onclick = () => {
 function applyTheme(choice) {
   const root = document.documentElement;
   if (choice === 'auto') delete root.dataset.theme; else root.dataset.theme = choice;
-  try { choice === 'auto' ? localStorage.removeItem('atlas-theme') : localStorage.setItem('atlas-theme', choice); } catch {}
+  try { localStorage.setItem('atlas-theme', choice); } catch {}   // 'auto' is saved too: no choice means dark
   $$('#theme button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeV === choice)));
+  if (!HOME.on) gmap?.setLook(searchLook(), 600);   // the globe follows: night in dark, the map's colours in light
 }
+darkQ.addEventListener?.('change', () => { if (!HOME.on) gmap?.setLook(searchLook(), 600); });
 $$('#theme button').forEach(b => b.onclick = () => applyTheme(b.dataset.themeV));
 $$('#theme button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeV === (document.documentElement.dataset.theme || 'auto'))));
 function setMenu(open) {
@@ -4063,6 +4677,7 @@ $('notice-btn').onclick = async () => {
 
 // ---------- boot ----------
 function bootError() {
+  homeSpin();
   setHead('Fare data didn’t load', '', false);
   $('res-body').innerHTML = emptyHTML('Fare data didn’t load', PUBLIC ? 'The search service isn’t answering. Try again in a minute.' : 'Neither the search service nor the saved copy answered. Check the connection, then try again.', 'retry-boot', 'Try again', true);
   $('subtitle').textContent = 'Fare data didn’t load';
@@ -4096,6 +4711,7 @@ async function boot() {
   if (S.mode === 'routes' && init.airport) W.sel = init.airport;
   render();
   if (init.run) runSearch({ keep: init });
+  homeSpin();
 }
 
 // A pasted or edited address (or Back to an earlier hash) loads that search.
@@ -4168,8 +4784,9 @@ phoneMQ.addEventListener('change', placeControls);
 // The results panel starts below the control panel, whatever height it wraps to (desktop), and
 // the profile tile sits centred on the first field pill of the form's first row (--acct-y).
 function trackTop() {
-  const root = document.documentElement.style, c = $('console').getBoundingClientRect();
-  root.setProperty('--top-h', `${Math.round(phoneMQ.matches ? 0 : c.bottom)}px`);
+  // Layout, not the box on screen: the bar may be mid-animation (growing out of Start searching).
+  const root = document.documentElement.style, el = $('console');
+  root.setProperty('--top-h', `${Math.round(phoneMQ.matches ? 0 : el.offsetTop + el.offsetHeight)}px`);
   if (phoneMQ.matches) return;
   const f = $('search').getBoundingClientRect();
   const first = [...$('search').querySelectorAll('.combo-box, .bar > .opts .pill-select, .date-row .input')]

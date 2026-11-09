@@ -79,48 +79,48 @@
   --bg: var(--base); --card: #ffffff; --line: var(--hairline); --bad: var(--bad-ink);
 }
 
-/* ---------- tokens: dark (green-charcoal; raised surfaces get lighter) ---------- */
+/* ---------- tokens: dark (ink charcoal from the home page's night globe; raised surfaces get lighter) ---------- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --tint: #eef3f0; --tint-fill: #eef3f0; --on-tint: #141917; --focus: #9fd3b4;
-    --ink: #eef3f0; --ink-2: #c3ccc7; --ink-3: #9ba6a0;
-    --hairline: #2e3632; --hairline-strong: #414b46; --rule: #414b46;
-    --fill: #2a322e; --fill-pressed: #343d38; --on-ink: #141917;
-    --base: #141917; --solid: #1e2421; --solid-2: #252c28; --surface: #1e2421;
-    --glass-bg: #1e2421; --glass-sheen: rgba(255, 255, 255, 0.06);
+    --tint: #eef2f8; --tint-fill: #eef2f8; --on-tint: #121726; --focus: #ffaadc;
+    --ink: #eef2f8; --ink-2: #c3ccd9; --ink-3: #9aa6b8;
+    --hairline: #263046; --hairline-strong: #3a4560; --rule: #3a4560;
+    --fill: #232b3d; --fill-pressed: #2d3649; --on-ink: #121726;
+    --base: #0d1220; --solid: #161c2b; --solid-2: #1c2334; --surface: #161c2b;
+    --glass-bg: #161c2b; --glass-sheen: rgba(255, 255, 255, 0.06);
     --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 40px -18px rgba(0, 0, 0, 0.7);
     --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 30px -18px rgba(0, 0, 0, 0.6);
     --lift: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 32px -14px rgba(0, 0, 0, 0.7);
-    --switch-on: #eef3f0; --knob: #141917;
-    --rail: #2b332f; --rail-ink: #c3ccc7; --rail-on: #eef3f0; --rail-on-ink: #141917;
-    --bubble: #2f3833; --bubble-ink: #ffffff; --bubble-ink-2: #d3dbd6; --bubble-ink-3: #b9c3bd;
+    --switch-on: #eef2f8; --knob: #121726;
+    --rail: #1f2738; --rail-ink: #c3ccd9; --rail-on: #eef2f8; --rail-on-ink: #121726;
+    --bubble: #252e42; --bubble-ink: #ffffff; --bubble-ink-2: #d3dae6; --bubble-ink-3: #b6c0d0;
     --lowest: #f2b33c; --picked: #f08a80;
     --mint: #1d3326;  --mint-ink: #a6dcb5;
     --warn-bg: #352a14; --warn-ink: #f0cf86; --warn-line: #4d3e1e;
     --bad-ink: #ff9a90; --bad-bg: #3a2321;
-    --card: #1e2421;
+    --card: #161c2b;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --tint: #eef3f0; --tint-fill: #eef3f0; --on-tint: #141917; --focus: #9fd3b4;
-  --ink: #eef3f0; --ink-2: #c3ccc7; --ink-3: #9ba6a0;
-  --hairline: #2e3632; --hairline-strong: #414b46; --rule: #414b46;
-  --fill: #2a322e; --fill-pressed: #343d38; --on-ink: #141917;
-  --base: #141917; --solid: #1e2421; --solid-2: #252c28; --surface: #1e2421;
-  --glass-bg: #1e2421; --glass-sheen: rgba(255, 255, 255, 0.06);
+  --tint: #eef2f8; --tint-fill: #eef2f8; --on-tint: #121726; --focus: #ffaadc;
+  --ink: #eef2f8; --ink-2: #c3ccd9; --ink-3: #9aa6b8;
+  --hairline: #263046; --hairline-strong: #3a4560; --rule: #3a4560;
+  --fill: #232b3d; --fill-pressed: #2d3649; --on-ink: #121726;
+  --base: #0d1220; --solid: #161c2b; --solid-2: #1c2334; --surface: #161c2b;
+  --glass-bg: #161c2b; --glass-sheen: rgba(255, 255, 255, 0.06);
   --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 40px -18px rgba(0, 0, 0, 0.7);
   --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 30px -18px rgba(0, 0, 0, 0.6);
   --lift: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 32px -14px rgba(0, 0, 0, 0.7);
-  --switch-on: #eef3f0; --knob: #141917;
-  --rail: #2b332f; --rail-ink: #c3ccc7; --rail-on: #eef3f0; --rail-on-ink: #141917;
-  --bubble: #2f3833; --bubble-ink: #ffffff; --bubble-ink-2: #d3dbd6; --bubble-ink-3: #b9c3bd;
+  --switch-on: #eef2f8; --knob: #121726;
+  --rail: #1f2738; --rail-ink: #c3ccd9; --rail-on: #eef2f8; --rail-on-ink: #121726;
+  --bubble: #252e42; --bubble-ink: #ffffff; --bubble-ink-2: #d3dae6; --bubble-ink-3: #b6c0d0;
   --lowest: #f2b33c; --picked: #f08a80;
   --mint: #1d3326;  --mint-ink: #a6dcb5;
   --warn-bg: #352a14; --warn-ink: #f0cf86; --warn-line: #4d3e1e;
   --bad-ink: #ff9a90; --bad-bg: #3a2321;
-  --card: #1e2421;
+  --card: #161c2b;
 }
 
 /* Increase Contrast: secondary inks become the main ink, hairlines become rules. */
@@ -1194,4 +1194,231 @@ body[data-mode="deals"] :is(.map-ctl, .legend) { display: none !important; }
   :root .wrap .top nav { margin-left: 0; }
   :root .wrap main { border-radius: 22px; }
   :root .wrap h2 { margin-top: 32px; }
+}
+
+/* =====================================================================
+   Phase 23: the home page (Direction C, "Grand tour") and the Night cabin search page (Direction B).
+   ===================================================================== */
+:root {
+  --accent: #ffaadc;       /* orchid: the home page's one accent (11.6:1 on --space); globe.js ACCENT */
+  --night-ink: #eef2f8;    /* text on the night sky */
+  --night-ink-2: #c3ccd9;  /* 11:1 on --space */
+}
+.gmap-sky, .gmap-fx { pointer-events: none; }
+
+/* ---------- Night cabin: raised charcoal panels with lit trim along the top edge (dark only) ---------- */
+:root[data-theme="dark"] body.app :is(.console, .results, .legend, .logo-pill, .map-ctl .round-btn, .top-pill, .modebar) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), var(--glass-shadow);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body.app :is(.console, .results, .legend, .logo-pill, .map-ctl .round-btn, .top-pill, .modebar) {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), var(--glass-shadow);
+  }
+}
+/* prices are the jewel: large, light figures */
+:root .pts, :root .dest .dp { font-size: 1.375rem; font-weight: 300; letter-spacing: -0.01em; }
+
+/* ---------- Night cabin, desktop: the search is one slim bar ----------
+   Profile, From/To, Depart (and Return on round trips), cabin, card, Search, then filters and …, on
+   one row. Trip type and Exact dates live in More filters. A narrower form (container query, in rem
+   so it follows the text size) wraps to two or three rows. */
+@media (min-width: 821px) {
+  .app .console {
+    grid-template-columns: auto minmax(0, 1fr) auto auto; grid-template-rows: auto;
+    grid-template-areas: "acct form filt menu"; align-items: end; padding: 10px 12px; border-radius: 22px;
+  }
+  .app .console > .profile { margin: 0 10px 0 0; align-self: end; }
+  .app .console > :is(.filters-btn, .menu-wrap) { align-self: end; margin-left: 10px; }
+  body:not([data-mode="search"]) .console { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "acct form menu"; }
+  .app .search .bar { grid-template-columns: minmax(0, 1.5fr) minmax(15rem, 1fr) auto auto; grid-template-areas: "places dates opts go"; }
+  body.app[data-trip="rt"] .search .bar {
+    grid-template-columns: minmax(0, 1.4fr) minmax(15rem, 1fr) minmax(13rem, 0.9fr) auto auto; grid-template-areas: "places dates ret opts go";
+  }
+  .app .search .opts { flex-wrap: nowrap; min-height: var(--ctl); }
+  .app .search #cabin { width: 7.5rem; }
+  .app .search #card { width: 10rem; white-space: nowrap; }
+  .app .search .more .seg { display: inline-flex; width: fit-content; }
+}
+@media (min-width: 821px) {
+  @container sform (max-width: 78rem) {
+    body.app[data-trip="rt"] .search .bar { grid-template-columns: minmax(0, 1.3fr) minmax(15rem, 1fr) auto; grid-template-areas: "places dates go" "ret opts opts"; }
+  }
+  @container sform (max-width: 60rem) {
+    .app .search .bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; grid-template-areas: "places places places" "dates opts go"; }
+    body.app[data-trip="rt"] .search .bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; grid-template-areas: "places places places" "dates ret ret" "opts opts go"; }
+  }
+}
+
+/* ---------- Night cabin, phone: the search is a slim two-line pill on top of the map ---------- */
+.app .top-pill { display: none; }
+@media (max-width: 820px) {
+  .app .top-pill {
+    position: fixed; z-index: 15; left: var(--edge); right: var(--edge-r); top: var(--edge-t);
+    display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 8px 8px 16px; border: 0;
+    border-radius: 18px; background: var(--solid); color: var(--ink); box-shadow: var(--glass-shadow);
+    font: inherit; text-align: left; cursor: pointer;
+  }
+  .app .top-pill:active { transform: scale(0.98); }
+  .app .tp-text { flex: 1; display: grid; gap: 2px; min-width: 0; }
+  .app .tp-text b, .app .tp-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .app .tp-text b { font-size: 0.9375rem; font-weight: 600; }
+  .app .tp-text small { font-size: 0.75rem; color: var(--ink-2); }
+  .app .tp-go { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-control); background: var(--tint-fill); color: var(--on-tint); }
+  body[data-mode="deals"] .top-pill { display: none; }
+  body.app:not([data-mode="deals"]) .map-ctl { top: calc(var(--edge-t) + 72px); }
+}
+
+/* ---------- the home page ---------- */
+.app .home { display: none; }
+html[data-home] .app .home { display: block; position: fixed; inset: 0; z-index: 50; pointer-events: none; color: var(--night-ink); }
+.app .home-brand {
+  position: absolute; left: var(--edge); top: var(--edge-t); display: flex; align-items: center; gap: 10px;
+  padding: 8px 4px; font-size: 1rem; font-weight: 600;
+}
+.app .home-hero {
+  position: absolute; left: max(var(--edge), 5vw); top: 50%; transform: translateY(-50%);
+  width: min(32rem, 31vw); display: grid; gap: 16px;
+}
+.app .home-ey { margin: 0; color: var(--night-ink-2); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+.app .home-h { margin: 0; font-size: clamp(3.5rem, 6.4vw, 6.25rem); font-weight: 600; line-height: 0.94; letter-spacing: -0.04em; text-wrap: balance; }
+.app .home-h em { font-style: normal; color: var(--accent); }
+.app .home-lede { margin: 0; color: var(--night-ink-2); font-size: 1.125rem; line-height: 1.5; max-width: 28ch; }
+.app .home-go {
+  justify-self: start; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; margin-top: 8px;
+  padding: 0 22px; border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); border-radius: var(--r-control);
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--night-ink);
+  font: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; pointer-events: auto;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.app .home-go svg { transition: transform 0.2s var(--ease); }
+.app .home-go:hover { background: color-mix(in srgb, var(--accent) 24%, transparent); border-color: var(--accent); }
+.app .home-go:hover svg { transform: translateX(3px); }
+.app .home-go:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 820px) {
+  .app .home-hero { left: var(--edge); right: var(--edge-r); top: calc(var(--edge-t) + 64px); width: auto; transform: none; gap: 12px; }
+  .app .home-h { font-size: clamp(3rem, 15vw, 4rem); }
+  .app .home-lede { font-size: 1rem; }
+}
+/* the search page stays hidden (and out of the tab order) while it loads under the home page */
+html[data-home="1"] body.app :is(.console, .results, .sheet, .sheet-head, .legend, .map-ctl, .logo-pill, .top-pill, .skip) { visibility: hidden; opacity: 0; }
+
+/* Motion. Nothing on the home page moves until the globe starts its spin (html[data-home-live], set by
+   the page), so the opening is never spent while the page is still loading: the globe fades up out of
+   the dark as it turns, then the hero comes in line by line, rising out of a blur, "next?" last with an
+   orchid bloom, then Start searching, which breathes softly until pressed.
+   Hand-over: the hero lifts and softens away (0.75 s) while the globe glides over (1.6 s); the search
+   bar drops in as the hero clears, then the panels rise and the controls fade in.
+   Animations go on the hero's children, never the hero: its own transform centres it. */
+@keyframes home-rise { from { transform: translateY(18px); opacity: 0; filter: blur(10px); } }
+@keyframes home-bloom { 0% { opacity: 0; filter: blur(14px); text-shadow: 0 0 0 transparent; } 60% { opacity: 1; filter: blur(0); text-shadow: 0 0 36px color-mix(in srgb, var(--accent) 70%, transparent); } 100% { opacity: 1; filter: blur(0); text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 22%, transparent); } }
+@keyframes home-breathe { 0%, 100% { opacity: 0; transform: scale(1); } 50% { opacity: 0.55; transform: scale(1.06); } }
+@keyframes home-out { to { transform: translateY(-24px); opacity: 0; filter: blur(6px); } }
+@keyframes globe-up { from { opacity: 0; } }
+@keyframes bar-drop { from { transform: translateY(-14px); opacity: 0; } }
+@keyframes panel-rise { from { transform: translateY(14px); opacity: 0; } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes map-dip { 0% { opacity: 1; } 35%, 50% { opacity: 0; } 100% { opacity: 1; } }
+html[data-home="1"]:not([data-home-live]) .app :is(.home-hero > *, .home-brand),
+html[data-home="1"]:not([data-home-live]) #map .maplibregl-canvas { opacity: 0; }
+html[data-home="1"][data-home-live] #map .maplibregl-canvas { animation: globe-up 1.4s ease-out both; }
+html[data-home="1"][data-home-live] .app :is(.home-hero > *, .home-brand) { animation: home-rise 0.9s var(--ease) both; }
+html[data-home="1"][data-home-live] .app .home-brand { animation-delay: 0.3s; }
+html[data-home="1"][data-home-live] .app .home-hero > :nth-child(1) { animation-delay: 0.6s; }
+html[data-home="1"][data-home-live] .app .home-hero > :nth-child(2) { animation-delay: 0.8s; }
+html[data-home="1"][data-home-live] .app .home-hero > :nth-child(3) { animation-delay: 1.25s; }
+html[data-home="1"][data-home-live] .app .home-hero > :nth-child(4) { animation-delay: 1.6s; }
+html[data-home="1"][data-home-live] .app .home-h em { display: inline-block; animation: home-bloom 1.6s ease-out both 1.15s; }
+.app .home-go { position: relative; }
+.app .home-go::after {
+  content: ""; position: absolute; inset: -5px; border-radius: calc(var(--r-control) + 5px); pointer-events: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent), 0 0 24px color-mix(in srgb, var(--accent) 35%, transparent);
+  opacity: 0;
+}
+html[data-home="1"][data-home-live] .app .home-go::after { animation: home-breathe 3.2s ease-in-out infinite 2.8s; }
+html[data-home="leaving"] .app :is(.home-hero > *, .home-brand) { animation: home-out 0.75s cubic-bezier(0.55, 0, 0.45, 1) both; }
+html[data-home="leaving"] .app .home-hero > :nth-child(2) { animation-delay: 0.04s; }
+html[data-home="leaving"] .app .home-hero > :nth-child(3) { animation-delay: 0.08s; }
+html[data-home="leaving"] .app .home-hero > :nth-child(4) { animation-delay: 0.12s; }
+html[data-home="leaving"] body.app :is(.console, .top-pill) { animation: bar-drop 0.45s var(--ease) both 0.6s; }
+html[data-home="leaving"] body.app .results { animation: panel-rise 0.55s var(--ease) both 0.8s; }
+html[data-home="leaving"] body.app :is(.sheet-head, .legend, .map-ctl, .logo-pill) { animation: fade-in 0.5s ease both 0.95s; }
+html[data-enter] body.app :is(.console, .top-pill) { animation: bar-drop 0.3s var(--ease) both 0.35s; }
+html[data-enter] body.app .results { animation: panel-rise 0.5s var(--ease) both 0.55s; }
+html[data-enter] body.app :is(.sheet-head, .legend, .map-ctl, .logo-pill) { animation: fade-in 0.4s ease both 0.7s; }
+@media (max-width: 820px) {
+  html[data-home="leaving"] body.app .sheet, html[data-enter] body.app .sheet { animation: fade-in 0.4s ease both 0.55s; }
+  html[data-home="leaving"] body.app .results, html[data-enter] body.app .results { animation: none; }
+}
+/* Reduced motion: nothing moves, spins, blurs or glides, but nothing pops either. The globe and the hero
+   fade in, and the hand-over is a crossfade: the hero fades out, the map dips to dark while it is
+   re-framed (globe.js jumps it), and the search UI fades in. */
+@media (prefers-reduced-motion: reduce) {
+  html[data-home="1"][data-home-live] .app :is(.home-hero > *, .home-brand, .home-h em) { animation: fade-in 0.8s ease both; }
+  html[data-home="1"][data-home-live] .app .home-hero > :nth-child(4) { animation-delay: 0.4s; }
+  html[data-home="1"][data-home-live] .app .home-go::after { animation: none; }
+  html[data-home="leaving"] .app :is(.home-hero > *, .home-brand) { animation: fade-out 0.4s ease both; }
+  html[data-home="leaving"] #map { animation: map-dip 0.9s ease both; }
+  html[data-home="leaving"] body.app :is(.console, .top-pill, .results, .sheet, .sheet-head, .legend, .map-ctl, .logo-pill) { animation: fade-in 0.4s ease both 0.5s; }
+  html[data-enter] body.app * { animation: none !important; }
+  .app .top-pill:active { transform: none; }
+}
+
+/* =====================================================================
+   Phase 25: Night cabin under the home page's sky.
+   Dark mode's panels are ink charcoal (the tokens above). Orchid marks only the one primary action
+   (Search flights, the phone pill's search), the current mode and the picked calendar day. Section
+   labels use the home page's tracked capitals. The hand-over from the home page is one move:
+   Start searching grows into the bar (map_template growFromButton), its contents fade in as it
+   lands, the results panel unfolds down from it, then the controls come in.
+   ===================================================================== */
+:root { --act: var(--tint-fill); --act-ink: var(--on-tint); --act-line: transparent; --mode-on: #ffffff; --mode-on-ink: #1e2220; --pick-ring: var(--picked); }
+:root[data-theme="dark"] {
+  --act: color-mix(in srgb, #ffaadc 16%, #161c2b); --act-ink: #ffffff; --act-line: color-mix(in srgb, #ffaadc 62%, transparent);
+  --mode-on: var(--act); --mode-on-ink: #ffffff; --pick-ring: #ffaadc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --act: color-mix(in srgb, #ffaadc 16%, #161c2b); --act-ink: #ffffff; --act-line: color-mix(in srgb, #ffaadc 62%, transparent);
+    --mode-on: var(--act); --mode-on-ink: #ffffff; --pick-ring: #ffaadc;
+  }
+}
+.app #go, .app .tp-go { background: var(--act); color: var(--act-ink); box-shadow: inset 0 0 0 1px var(--act-line); }
+.app .modebar button[aria-pressed="true"] { background: var(--mode-on); color: var(--mode-on-ink); box-shadow: inset 0 0 0 1px var(--act-line); }
+:root .day[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--solid), 0 0 0 4.5px var(--pick-ring); }
+.app .list-h { padding-top: 12px; color: var(--ink-2); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+:root .app .cal > summary { color: var(--ink-2); font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; }
+:root .app .cal > summary .low { font-size: 0.8125rem; letter-spacing: 0; text-transform: none; }
+
+@keyframes panel-unfold {
+  from { clip-path: inset(0 0 100% 0 round var(--r-widget)); transform: translateY(-10px); opacity: 0; }
+  30% { opacity: 1; }
+  to { clip-path: inset(0 0 0 0 round var(--r-widget)); transform: none; }
+}
+@keyframes rise-in { from { transform: translateY(8px); opacity: 0; } }
+@keyframes bar-grow {
+  from { transform: translate(var(--gx, 0px), var(--gy, 0px)); clip-path: var(--gclip, inset(0 round 20px)); background-color: var(--gtint, var(--solid)); }
+  to { transform: none; clip-path: inset(0 round var(--gr, 20px)); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* the bar grows out of Start searching (its start box from map_template growFromButton) and its
+     contents fade in as it lands, so it doesn't also drop in */
+  html[data-home="leaving"][data-grow] body.app :is(.console, .top-pill) { animation: bar-grow 0.72s cubic-bezier(0.65, 0, 0.35, 1) both 0.08s; }
+  html[data-home="leaving"][data-grow] body.app :is(.console, .top-pill) > * { animation: fade-in 0.3s ease both 0.65s; }
+  html[data-home="leaving"][data-grow] body.app :is(.console, .top-pill) > :nth-child(2) { animation-delay: 0.7s; }
+  html[data-home="leaving"][data-grow] body.app :is(.console, .top-pill) > :nth-child(n+3) { animation-delay: 0.75s; }
+  html[data-home="leaving"][data-grow] .app .home-hero > .home-go { animation: fade-out 0.1s linear both 0.08s; }
+  html[data-home="leaving"] body.app .results { animation: panel-unfold 0.55s var(--ease) both 0.7s; }
+  html[data-home="leaving"] body.app #res-body > *, html[data-home="leaving"] body.app #res-body .list > li { animation: rise-in 0.4s var(--ease) both 0.85s; }
+  html[data-home="leaving"] body.app #res-body > :nth-child(2) { animation-delay: 0.9s; }
+  html[data-home="leaving"] body.app #res-body > :nth-child(n+3) { animation-delay: 0.95s; }
+  html[data-home="leaving"] body.app #res-body .list > li:nth-child(2) { animation-delay: 1s; }
+  html[data-home="leaving"] body.app #res-body .list > li:nth-child(3) { animation-delay: 1.04s; }
+  html[data-home="leaving"] body.app #res-body .list > li:nth-child(4) { animation-delay: 1.08s; }
+  html[data-home="leaving"] body.app #res-body .list > li:nth-child(5) { animation-delay: 1.12s; }
+  html[data-home="leaving"] body.app #res-body .list > li:nth-child(n+6) { animation-delay: 1.16s; }
+  html[data-home="leaving"] body.app :is(.sheet-head, .legend, .map-ctl, .logo-pill) { animation: fade-in 0.4s ease both 1s; }
+}
+@media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
+  html[data-home="leaving"] body.app .results { animation: none; }
 }
