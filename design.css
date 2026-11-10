@@ -1422,3 +1422,21 @@ html[data-enter] body.app :is(.sheet-head, .legend, .map-ctl, .logo-pill) { anim
 @media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
   html[data-home="leaving"] body.app .results { animation: none; }
 }
+
+/* =====================================================================
+   Light graphics (html[data-perf="lite"]: software rendering, a weak GPU, or the … menu's Graphics).
+   The same look with the costly parts gone: no blur filters or glows in the home page's motion, and
+   nothing animating forever, so the screen holds still unless something changes. globe.js does the
+   rest (no smoothing, one pixel per CSS pixel, still stars, no comets or rings).
+   ===================================================================== */
+@keyframes home-rise-lite { from { transform: translateY(18px); opacity: 0; } }
+@keyframes home-out-lite { to { transform: translateY(-24px); opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  html[data-perf="lite"][data-home="1"][data-home-live] .app :is(.home-hero > *, .home-brand) { animation-name: home-rise-lite; }
+  html[data-perf="lite"][data-home="1"][data-home-live] .app .home-h em {
+    animation: fade-in 1s ease-out both 1.15s; text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  html[data-perf="lite"][data-home="1"][data-home-live] .app .home-go::after { animation: fade-in 0.6s ease both 2.8s; opacity: 0.4; }
+  html[data-perf="lite"][data-home="leaving"] .app :is(.home-hero > *, .home-brand) { animation-name: home-out-lite; }
+}
+.app .menu .graphics-seg { display: flex; }

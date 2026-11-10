@@ -15,6 +15,30 @@
   // link, Back, Routes or Deals): the search page loads under it, then it hands over.
   try { const p = new URLSearchParams(location.hash.slice(1)); if (!p.get('from') && !p.get('to') && !p.get('mode')) root.dataset.home = '1'; } catch {}
   if (!root.dataset.home) root.dataset.enter = '1';   // opened straight on a search: the bar drops in, the panels rise
+  // Graphics: light mode for software rendering and weak GPUs (globe.js opts.lite, design.css
+  // html[data-perf="lite"]). The visitor's choice in the … menu wins (wtp-graphics: full or light; ?graphics=
+  // sets it too); otherwise Auto: light when the browser draws WebGL in software or has no GPU worth the
+  // name, or when the map's frame watch found this device too slow in the last 14 days (wtp-graphics-slow).
+  try {
+    const q = new URLSearchParams(location.search).get('graphics');
+    if (q === 'full' || q === 'light') localStorage.setItem('wtp-graphics', q); else if (q === 'auto') localStorage.removeItem('wtp-graphics');
+  } catch {}
+  root.dataset.perf = (() => {
+    let pick = null, slow = 0;
+    try { pick = localStorage.getItem('wtp-graphics'); slow = +localStorage.getItem('wtp-graphics-slow') || 0; } catch {}
+    if (pick === 'full' || pick === 'light') return pick === 'light' ? 'lite' : 'full';
+    if (Date.now() - slow < 14 * 864e5) return 'lite';
+    try {
+      const c = document.createElement('canvas');
+      // A context that refuses a "major performance caveat" is null when WebGL runs in software.
+      const gl = c.getContext('webgl', { failIfMajorPerformanceCaveat: true });
+      if (!gl) return c.getContext('webgl') ? 'lite' : 'full';   // no WebGL at all: the map says so instead
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      const name = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return /swiftshader|llvmpipe|softpipe|lavapipe|software|basic render|microsoft basic|mesa offscreen/i.test(name) ? 'lite' : 'full';
+    } catch { return 'full'; }
+  })();
 </script>
 <meta name="description" content="Where To Points: see where your credit card points can fly you. Award seats priced in Amex, Chase, Citi, Capital One and Bilt points, on a map.">
 <title>Where To Points</title>
@@ -978,6 +1002,13 @@ body[data-mode="deals"] .search { display: none !important; }
           <h2>Data</h2>
           <p id="subtitle"><span class="skel" aria-hidden="true">Loading fare data</span><span class="sr-only">Loading fare data…</span></p>
           <p id="menu-note">Loading…</p>
+          <h2 id="graphics-l">Graphics</h2>
+          <div class="seg graphics-seg" role="group" aria-labelledby="graphics-l" aria-describedby="graphics-note" id="graphics">
+            <button type="button" data-graphics-v="auto" aria-pressed="true" title="Light on slow or software graphics">Auto</button>
+            <button type="button" data-graphics-v="full" aria-pressed="false">Full</button>
+            <button type="button" data-graphics-v="light" aria-pressed="false">Light</button>
+          </div>
+          <p id="graphics-note"></p>
           <div class="menu-legal" id="menu-legal" hidden>
             <h2>About</h2>
             <p>Not affiliated with or endorsed by any airline, loyalty program or card issuer. Names identify their programs.</p>
@@ -1525,9 +1556,15 @@ const GlobeMap = (() => {
   }
 
   // ---------- the map ----------
+  const litePixelRatio = () => Math.min(1, window.devicePixelRatio || 1);
   function create(el, opts = {}) {
     if (typeof maplibregl === 'undefined' || typeof pmtiles === 'undefined' || !document.createElement('canvas').getContext) return null;
     const reduce = opts.reduceMotion || (() => false);
+    // Light mode, for software rendering and weak GPUs (the page decides at load, or the frame watch
+    // below switches it on): no multisampling, at most one map pixel per CSS pixel, no symbol fades, and
+    // none of the sky's or Night cabin's continuous motion (streaks, twinkle, shooting stars, comets,
+    // rings), so the page draws only when the map moves and the GPU rests when it doesn't. The look stays.
+    let lite = !!opts.lite;
     const insets = opts.insets || (() => ({ top: 0, right: 0, bottom: 0, left: 0 }));
     const vendor = new URL(opts.vendor || 'vendor/', location.href).href;
     const tiles = new URL(opts.tiles || 'tiles/world.pmtiles', location.href).href;
@@ -1545,7 +1582,8 @@ const GlobeMap = (() => {
       map = new maplibregl.Map({
         container: box, style: buildStyle(vendor, tiles), center: [-40, 25], zoom: 1, minZoom: 0, maxZoom: 11,
         pitchWithRotate: false, dragRotate: false, touchPitch: false, keyboard: false,
-        attributionControl: false, canvasContextAttributes: { antialias: true },
+        attributionControl: false, canvasContextAttributes: { antialias: !lite },
+        ...(lite ? { pixelRatio: litePixelRatio(), fadeDuration: 0 } : {}),
       });
     } catch (e) {
       box.remove();
@@ -1710,7 +1748,7 @@ const GlobeMap = (() => {
     // after delay ms and spread over spread ms by distance. Nothing with reduced motion.
     let reveal = null;
     function revealDots(lat, lon, { delay = 0, spread = 700 } = {}) {
-      if (reduce() || !W) { reveal = null; return; }
+      if (reduce() || lite || !W) { reveal = null; return; }
       const t0 = performance.now() + delay;
       reveal = { c: [lat, lon], t0, spread, end: t0 + spread + 300 };
       const tick = () => { if (!reveal) return; map.triggerRepaint(); requestAnimationFrame(tick); };
@@ -1791,7 +1829,7 @@ const GlobeMap = (() => {
     function queueMeteor() { clearTimeout(meteorT); meteorT = setTimeout(launchMeteor, 9000 + Math.random() * 6000); }
     function launchMeteor() {
       queueMeteor();
-      if (!W || reduce() || document.hidden || spinning()) return;
+      if (!W || reduce() || lite || document.hidden || spinning()) return;
       const a = (200 + Math.random() * 40) * RAD;   // falling down and to the left
       meteor = { t0: performance.now(), x: W * (0.35 + Math.random() * 0.6), y: H * (0.05 + Math.random() * 0.35), ux: Math.cos(a), uy: -Math.sin(a), d: Math.min(W, H) * 0.35 };
       const tick = () => { paintSky(); if (meteor) requestAnimationFrame(tick); };
@@ -1817,7 +1855,7 @@ const GlobeMap = (() => {
     let ambRAF = 0, ambLast = 0;
     function ambient(now) {
       ambRAF = 0;
-      if (look !== 'intro' || reduce() || document.hidden || !W) return;
+      if (look !== 'intro' || reduce() || lite || document.hidden || !W) return;
       if (now - ambLast > 30 && !spinning()) { ambLast = now; paintSky(); }
       ambRAF = requestAnimationFrame(ambient);
     }
@@ -1855,10 +1893,19 @@ const GlobeMap = (() => {
       const c = map.getCenter(), q = map.project([c.lng, c.lat]), r = globeRadius(), f = H / (2 * FOV_TAN);
       return { x: q.x, y: q.y, rs: f * r / Math.sqrt(f * f + 2 * r * f) };
     }
+    // Light mode: the stars hold still (no drift, streaks or twinkle) and the sky repaints only when what
+    // it draws changes: the globe's place and size on screen, the look's crossfade or the canvas size.
+    // Turning the globe in place, the usual move, then costs the sky nothing.
+    let skyKey = '';
     function paintSky() {
       if (!W) return;
       const key = `${W}x${H}@${dpr}`;
       if (!stars || stars.key !== key) { stars = starField(W, H, dpr); stars.key = key; }
+      if (lite) {
+        const g = screenGlobe(), k = `${key}|${Math.round(g.x)},${Math.round(g.y)},${Math.round(g.rs)}|${introF.toFixed(3)},${nightF.toFixed(3)},${ringRot.toFixed(3)}`;
+        if (k === skyKey) return;
+        skyKey = k;
+      }
       sctx.setTransform(1, 0, 0, 1, 0, 0);
       sctx.clearRect(0, 0, sky.width, sky.height);
       const sw = sky.width, sh = sky.height, c = map.getCenter(), now = performance.now();
@@ -1866,7 +1913,7 @@ const GlobeMap = (() => {
       else { const d = c.lng - prevLng; skyLng += d - 360 * Math.round(d / 360); }
       prevLng = c.lng;
       const perDeg = 0.25 * sw / 360;   // device px of drift per degree, the same both ways
-      const offX = -skyLng * perDeg, offY = c.lat * perDeg;
+      const offX = lite ? 0 : -skyLng * perDeg, offY = lite ? 0 : c.lat * perDeg;
       const dx = (offX % sw + sw) % sw, dy = (offY % sh + sh) % sh, dt = now - lastT;
       // Velocity, smoothed over ~80 ms so the streaks ease in and out instead of flickering. Repeat
       // paints within one frame keep the last value; a long pause reads as stopped.
@@ -1878,10 +1925,10 @@ const GlobeMap = (() => {
       }
       // Motion blur: each star draws as a line back along its drift, as long as a 1/25 s shutter
       // would catch: level lines when the globe spins, slanted or upright when it moves any other way.
-      const sp = Math.hypot(skyV[0], skyV[1]), L = reduce() ? 0 : Math.min(sp / 25, 70 * dpr);
+      const sp = lite ? 0 : Math.hypot(skyV[0], skyV[1]), L = reduce() ? 0 : Math.min(sp / 25, 70 * dpr);
       if (L > 2 * dpr) streaks(dx, dy, sw, sh, skyV[0] / sp * L, skyV[1] / sp * L, L);
       else for (const ox of [dx - sw, dx]) for (const oy of [dy - sh, dy]) sctx.drawImage(stars, Math.round(ox), Math.round(oy));
-      if (introF > 0 && !reduce()) twinkle(dx, dy, sw, sh);
+      if (introF > 0 && !reduce() && !lite) twinkle(dx, dy, sw, sh);
       // When the globe stops, no frame comes to clear the streaks: settle them shortly after.
       if (sp && !settleT) settleT = setTimeout(() => { settleT = 0; paintSky(); }, 120);
       sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1904,14 +1951,14 @@ const GlobeMap = (() => {
       // The rim: dusk light just outside the globe's edge. It breathes only on the home page (elsewhere
       // the sky paints with the map's frames, so a clock here would flicker).
       const rim = sctx.createRadialGradient(x, y, rs * 0.97, x, y, rs * 1.2);
-      const tA = reduce() ? 0 : performance.now() / 1000, breathe = look === 'intro' ? 0.86 + 0.14 * Math.sin(tA * TAU / 6) : 1;
+      const tA = reduce() || lite ? 0 : performance.now() / 1000, breathe = look === 'intro' && !lite ? 0.86 + 0.14 * Math.sin(tA * TAU / 6) : 1;
       const rimA = Math.max(f, RIM_NIGHT * nightF) * breathe;
       rim.addColorStop(0, rgbaOf(ACCENT, 0.42 * rimA)); rim.addColorStop(0.35, rgbaOf(ACCENT, 0.12 * rimA)); rim.addColorStop(1, rgbaOf(ACCENT, 0));
       sctx.fillStyle = rim; sctx.beginPath(); sctx.arc(x, y, rs * 1.2, 0, TAU); sctx.fill();
       // The heading ring, labelled like a heading indicator, while the whole globe is on screen. It turns
       // slowly on the home page (a full turn in 4 min) and holds still after. Handing over to the night
       // look it dims to a faint frame; to the map look it widens as it fades.
-      if (look === 'intro' && !reduce()) ringRot = tA * 1.5 * RAD;
+      if (look === 'intro' && !reduce() && !lite) ringRot = tA * 1.5 * RAD;
       const ringA = Math.max(f, RING_NIGHT * nightF), rot = ringRot;
       const RR = (rs * 1.16 + 6) * (1 + 0.22 * (1 - Math.max(f, nightF)) ** 0.7);
       if (RR > 0.75 * Math.max(W, H) || ringA < 0.01) return;
@@ -2031,7 +2078,7 @@ const GlobeMap = (() => {
       fxRAF = 0;
       fctx.setTransform(1, 0, 0, 1, 0, 0);
       fctx.clearRect(0, 0, fx.width, fx.height);
-      if (!W || reduce() || document.hidden || look === 'intro') return;
+      if (!W || reduce() || lite || document.hidden || look === 'intro') return;
       const shownDots = dottedKey ? new Set(dottedKey.split(',')) : new Set();
       const routes = scene.routes.filter(r => !r.potential || shownDots.has(r.code)).slice(0, MAX_COMETS);
       const rings = pillNodes.filter(n => n.on).slice(0, MAX_RINGS).map(n => n.p.p);
@@ -2212,7 +2259,7 @@ const GlobeMap = (() => {
     // ----- size -----
     function resize() {
       const r = el.getBoundingClientRect();
-      const w = Math.round(r.width), h = Math.round(r.height), d = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.round(r.width), h = Math.round(r.height), d = Math.min(lite ? 1 : 2, window.devicePixelRatio || 1);
       if (!w || !h || (w === W && h === H && d === dpr)) return;
       const first = !W;
       W = w; H = h; dpr = d;
@@ -2255,6 +2302,38 @@ const GlobeMap = (() => {
       backoff = Math.min(15000, backoff * 1.5);
     });
 
+    // ----- the frame watch: a GPU that can't keep up switches to light mode -----
+    // While the map moves (a drag, the spin, a glide), the time between its frames. When they're too slow
+    // (below) the map goes light for the rest of the visit and tells the page (opts.onLite), which
+    // remembers it. Off when the visitor chose Full (opts.watch false).
+    let lastFrame = 0, wasMoving = false, gaps = [];
+    function watchFrames() {
+      if (lite || opts.watch === false) return;
+      const now = performance.now(), gap = now - lastFrame, moving = !!(map.isMoving() || spinning() || reveal);
+      const counts = moving && wasMoving && gap < 3000;   // a gap from before a move began isn't a frame time
+      lastFrame = now; wasMoving = moving;
+      if (!counts) return;
+      gaps.push(gap);
+      if (gaps.length > 30) gaps.shift();
+      // 30 moving frames with a median over 60 ms (under ~16 a second), or 6 in a row over 250 ms
+      const slow = (gaps.length === 30 && gaps.slice().sort((a, b) => a - b)[15] > 60)
+        || (gaps.length >= 6 && gaps.slice(-6).every(g => g > 250));
+      if (slow) goLite('slow');
+    }
+    map.on('render', watchFrames);
+    function goLite(why = 'asked') {
+      if (lite) return;
+      lite = true;
+      map.off('render', watchFrames);
+      try { map.setPixelRatio(litePixelRatio()); } catch { /* older MapLibre */ }
+      reveal = null; meteor = null; clearTimeout(meteorT);
+      cancelAnimationFrame(ambRAF); ambRAF = 0;
+      skyKey = '';
+      resize();
+      redraw();
+      opts.onLite?.(why);
+    }
+
     return {
       setScene(next) {
         scene = { routes: next.routes || [], dots: next.dots || [], origins: next.origins || [], pills: next.pills || [], cap: !!next.cap, maxDotted: next.maxDotted };
@@ -2281,6 +2360,8 @@ const GlobeMap = (() => {
       invert,
       project: (lat, lon) => projector()(lat, lon),
       landFailed: () => failed,
+      lite: () => lite,
+      goLite,
       map,
     };
   }
@@ -3150,6 +3231,13 @@ function initMap() {
     look: HOME.on ? 'intro' : searchLook(),   // the home page's engraved globe from the first frame
     insets: mapInsets,
     reduceMotion: () => reduceMotion.matches,
+    lite: document.documentElement.dataset.perf === 'lite',
+    watch: graphicsChoice() === 'auto',   // a choice of Full keeps full graphics however slow the frames
+    onLite: why => {
+      document.documentElement.dataset.perf = 'lite';
+      if (why === 'slow') try { localStorage.setItem('wtp-graphics-slow', String(Date.now())); } catch {}
+      showGraphics();
+    },
     tiles: CFG.site?.tilesUrl || CFG.tilesUrl || 'tiles/world.pmtiles',
     onLandError: () => { $('map-frame').classList.add('no-land'); $('map-frame').querySelector('.attrib').textContent = 'The map’s tiles couldn’t load'; },
   }) : null;
@@ -4628,7 +4716,27 @@ function applyTheme(choice) {
 darkQ.addEventListener?.('change', () => { if (!HOME.on) gmap?.setLook(searchLook(), 600); });
 $$('#theme button').forEach(b => b.onclick = () => applyTheme(b.dataset.themeV));
 $$('#theme button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeV === (document.documentElement.dataset.theme || 'auto'))));
+// Graphics (the head script picks full or light at load): a new choice reloads, since the map's
+// smoothing is fixed when its canvas is made.
+function graphicsChoice() { try { const v = localStorage.getItem('wtp-graphics'); return v === 'full' || v === 'light' ? v : 'auto'; } catch { return 'auto'; } }
+function showGraphics() {
+  const c = graphicsChoice(), lite = document.documentElement.dataset.perf === 'lite';
+  $$('#graphics button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.graphicsV === c)));
+  $('graphics-note').textContent = c === 'auto' ? (lite ? 'Light on this device: still stars, no comets, a lighter map.' : 'Full on this device. Turns light if the map runs slow.')
+    : c === 'light' ? 'Still stars, no comets, a lighter map.' : 'Every effect, even if the map runs slow.';
+}
+$$('#graphics button').forEach(b => b.onclick = () => {
+  const v = b.dataset.graphicsV;
+  if (v === graphicsChoice()) return;
+  try {
+    if (v === 'auto') { localStorage.removeItem('wtp-graphics'); localStorage.removeItem('wtp-graphics-slow'); }
+    else localStorage.setItem('wtp-graphics', v);
+  } catch {}
+  location.reload();
+});
+showGraphics();
 function setMenu(open) {
+  if (open) showGraphics();
   $('menu').hidden = !open;
   $('menu-btn').setAttribute('aria-expanded', String(open));
   if (open) $('menu').focus();
